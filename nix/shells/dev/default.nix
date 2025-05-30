@@ -26,7 +26,10 @@ mkShell {
     with pkgs;
     [
       python3Packages.bandit
-      python313Packages.opentelemetry-instrumentation # for bootstrap
+      (python313Packages.opentelemetry-instrumentation.overrideAttrs (old:
+        {
+            propagatedBuildInputs = old.propagatedBuildInputs ++ [ pkgs.python313Packages.packaging ];
+        }))# for bootstrap
       deadnix
       python313
       pyright
