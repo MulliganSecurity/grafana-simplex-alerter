@@ -80,9 +80,9 @@ def run():
         "-e",
         "--endpoint",
         action="store",
-        help="endpoint to receive webhook calls (default 127.0.0.1:7897)"
+        help="endpoint to receive webhook calls (default 127.0.0.1:7897)",
         default = "127.0.0.1:7897",
-        dest="gen_config",
+        dest="endpoint",
     )
 
 
