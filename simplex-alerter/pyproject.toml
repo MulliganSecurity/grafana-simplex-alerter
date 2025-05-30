@@ -1,0 +1,15 @@
+[project]
+name = "simplex-alerter"
+version = "0.1.0"
+description = "webhook based simpleX alerter"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "observlib",
+]
+
+[project.scripts]
+simplex-alerter = "simplex_alerter:__main__.run"
+
+[tool.uv.sources]
+observlib = { git = "https://github.com/ForgottenBeast/observlib.git", subdirectory = "lib" }
