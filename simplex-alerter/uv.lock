@@ -93,6 +93,15 @@ wheels = [
 ]
 
 [[package]]
+name = "asgiref"
+version = "3.8.1"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/29/38/b3395cc9ad1b56d2ddac9970bc8f4141312dbaec28bc7c218b0dfafd0f42/asgiref-3.8.1.tar.gz", hash = "sha256:c343bd80a0bec947a9860adb4c432ffa7db769836c64238fc34bdc3fec84d590", size = 35186, upload-time = "2024-03-22T14:39:36.863Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/39/e3/893e8757be2612e6c266d9bb58ad2e3651524b5b40cf56761e985a28b13e/asgiref-3.8.1-py3-none-any.whl", hash = "sha256:3e1e3ecc849832fe52ccf2cb6686b7a55f82bb1d6aee72a58826471390335e47", size = 23828, upload-time = "2024-03-22T14:39:34.521Z" },
+]
+
+[[package]]
 name = "attrs"
 version = "25.3.0"
 source = { registry = "https://pypi.org/simple" }
@@ -350,13 +359,15 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "0.1.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=lib#7d8cb34a2bc35243ab06f869462ff16e0fbd3b78" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=lib#6d6a3804b544e2af5c192ceef6764c58107db613" }
 dependencies = [
     { name = "fastapi" },
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },
+    { name = "opentelemetry-exporter-prometheus" },
     { name = "opentelemetry-instrumentation-asyncio" },
-    { name = "opentelemetry-instrumentation-urllib" },
+    { name = "opentelemetry-instrumentation-logging" },
+    { name = "opentelemetry-instrumentation-threading" },
     { name = "opentelemetry-sdk" },
     { name = "prometheus-client" },
     { name = "pyroscope-io" },
@@ -468,6 +479,22 @@ wheels = [
 ]
 
 [[package]]
+name = "opentelemetry-instrumentation-asgi"
+version = "0.54b1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "asgiref" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "opentelemetry-util-http" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/20/f7/a3377f9771947f4d3d59c96841d3909274f446c030dbe8e4af871695ddee/opentelemetry_instrumentation_asgi-0.54b1.tar.gz", hash = "sha256:ab4df9776b5f6d56a78413c2e8bbe44c90694c67c844a1297865dc1bd926ed3c", size = 24230, upload-time = "2025-05-16T19:03:30.234Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/20/24/7a6f0ae79cae49927f528ecee2db55a5bddd87b550e310ce03451eae7491/opentelemetry_instrumentation_asgi-0.54b1-py3-none-any.whl", hash = "sha256:84674e822b89af563b283a5283c2ebb9ed585d1b80a1c27fb3ac20b562e9f9fc", size = 16338, upload-time = "2025-05-16T19:02:22.808Z" },
+]
+
+[[package]]
 name = "opentelemetry-instrumentation-asyncio"
 version = "0.54b1"
 source = { registry = "https://pypi.org/simple" }
@@ -495,6 +522,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/7b/b7/b74e2c7c858cde8909516cbe77cb0e841167d38795c90df524d84440e1f1/opentelemetry_instrumentation_dbapi-0.54b1.tar.gz", hash = "sha256:69421c36994114040d197f7e846c01869d663084c6c2025e85b2d6cfce2f8299", size = 14145, upload-time = "2025-05-16T19:03:40.074Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/83/6a/98d409ae5ca60ae4e41295a42256d81bb96bd5a7a386ca0343e27494d53d/opentelemetry_instrumentation_dbapi-0.54b1-py3-none-any.whl", hash = "sha256:21bc20cd878a78bf44bab686e9679cef1eed77e53c754c0a09f0ca49f5fd0283", size = 12450, upload-time = "2025-05-16T19:02:36.041Z" },
+]
+
+[[package]]
+name = "opentelemetry-instrumentation-fastapi"
+version = "0.54b1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-instrumentation-asgi" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "opentelemetry-util-http" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/98/3b/9a262cdc1a4defef0e52afebdde3e8add658cc6f922e39e9dcee0da98349/opentelemetry_instrumentation_fastapi-0.54b1.tar.gz", hash = "sha256:1fcad19cef0db7092339b571a59e6f3045c9b58b7fd4670183f7addc459d78df", size = 19325, upload-time = "2025-05-16T19:03:45.359Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/9c/6b2b0f9d6c5dea7528ae0bf4e461dd765b0ae35f13919cd452970bb0d0b3/opentelemetry_instrumentation_fastapi-0.54b1-py3-none-any.whl", hash = "sha256:fb247781cfa75fd09d3d8713c65e4a02bd1e869b00e2c322cc516d4b5429860c", size = 12125, upload-time = "2025-05-16T19:02:41.172Z" },
 ]
 
 [[package]]
@@ -819,16 +862,15 @@ dependencies = [
     { name = "aiohttp-socks" },
     { name = "fastapi" },
     { name = "observlib" },
-    { name = "opentelemetry-exporter-prometheus" },
     { name = "opentelemetry-instrumentation-asyncio" },
     { name = "opentelemetry-instrumentation-dbapi" },
+    { name = "opentelemetry-instrumentation-fastapi" },
     { name = "opentelemetry-instrumentation-logging" },
     { name = "opentelemetry-instrumentation-sqlite3" },
     { name = "opentelemetry-instrumentation-threading" },
     { name = "opentelemetry-instrumentation-urllib" },
     { name = "opentelemetry-instrumentation-wsgi" },
     { name = "opentelemetry-sdk" },
-    { name = "prometheus-client" },
     { name = "pyyaml" },
     { name = "uvicorn" },
 ]
@@ -839,16 +881,15 @@ requires-dist = [
     { name = "aiohttp-socks", specifier = ">=0.10.1" },
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "observlib", git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=lib" },
-    { name = "opentelemetry-exporter-prometheus", specifier = ">=0.54b1" },
     { name = "opentelemetry-instrumentation-asyncio", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-dbapi", specifier = ">=0.53b1" },
+    { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.54b1" },
     { name = "opentelemetry-instrumentation-logging", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-sqlite3", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-threading", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-urllib", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-wsgi", specifier = ">=0.53b1" },
     { name = "opentelemetry-sdk", specifier = ">=1.33.1" },
-    { name = "prometheus-client", specifier = ">=0.22.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "uvicorn", specifier = ">=0.34.2" },
 ]
