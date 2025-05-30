@@ -7,6 +7,7 @@ requires-python = ">=3.13"
 dependencies = [
     "aiohttp>=3.12.4",
     "observlib",
+    "opentelemetry-exporter-prometheus>=0.54b1",
     "opentelemetry-instrumentation-asyncio>=0.53b1",
     "opentelemetry-instrumentation-dbapi>=0.53b1",
     "opentelemetry-instrumentation-logging>=0.53b1",
@@ -14,6 +15,7 @@ dependencies = [
     "opentelemetry-instrumentation-threading>=0.53b1",
     "opentelemetry-instrumentation-urllib>=0.53b1",
     "opentelemetry-instrumentation-wsgi>=0.53b1",
+    "opentelemetry-sdk>=1.33.1",
     "prometheus-client>=0.22.0",
 ]
 
