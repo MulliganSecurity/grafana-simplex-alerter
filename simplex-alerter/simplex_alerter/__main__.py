@@ -1,3 +1,5 @@
+from .api import get_app, set_local, set_endpoint
+import uvicorn
 from time import sleep
 import argparse
 from observlib import configure_telemetry
@@ -37,8 +39,16 @@ def run():
         "-d",
         "--debug",
         action="store_true",
-        help="enable debug mode, increase telemetry sampling rate",
+        help="enable debug mode, increases pyroscope sampling rate if configured",
         dest="debug",
+    )
+
+    parser.add_argument(
+        "-l",
+        "--local",
+        action="store_true",
+        help="enable local mode, simplex connections won't be run through tor",
+        dest="local",
     )
 
     parser.add_argument(
@@ -66,6 +76,16 @@ def run():
         dest="gen_config",
     )
 
+    parser.add_argument(
+        "-e",
+        "--endpoint",
+        action="store",
+        help="endpoint to receive webhook calls (default 127.0.0.1:7897)"
+        default = "127.0.0.1:7897",
+        dest="gen_config",
+    )
+
+
     args = parser.parse_args()
 
     configure_telemetry(
@@ -76,5 +96,9 @@ def run():
         args.prometheus_config,
     )
 
-    while True:
-        sleep(1)
+    [host, port] = args.endpoint.split(":")
+
+    set_local(args.local)
+    set_endpoint(f"http://{args.endpoint}")
+    app = get_app()
+    uvicorn.run(app, host=host, port=int(port))
