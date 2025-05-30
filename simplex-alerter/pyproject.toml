@@ -14,6 +14,7 @@ dependencies = [
     "opentelemetry-instrumentation-threading>=0.53b1",
     "opentelemetry-instrumentation-urllib>=0.53b1",
     "opentelemetry-instrumentation-wsgi>=0.53b1",
+    "prometheus-client>=0.22.0",
 ]
 
 [project.scripts]
