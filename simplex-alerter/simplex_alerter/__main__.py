@@ -1,8 +1,10 @@
-def import argparse
+from time import sleep
+import argparse
 from observlib import configure_telemetry
 from .config import generate_config, load_config
 
 def run():
+    parser = argparse.ArgumentParser()
     parser.add_argument(
         "-a",
         "--address",
@@ -14,7 +16,7 @@ def run():
     parser.add_argument(
         "-p", "--port", default=8080, action="store", dest="port", help="bind port"
     )
-    parser.add_argument("-m","--metrics", action = "store", dest = "prometheus_port", default = "127.0.0.1:0", help = "interface and port to expose legacy prometheus metrics, 0 to disable")
+    parser.add_argument("-m","--metrics", action = "store", dest = "prometheus_config", default = "127.0.0.1:0", help = "interface and port to expose legacy prometheus metrics, port to 0 to disable, default 127.0.0.1:0")
     parser.add_argument(
         "-o",
         "--opentelemetry",
@@ -59,18 +61,20 @@ def run():
         "-s",
         "--simplex-ws-server",
         action="store",
-        help="simplex server for alerting"
-        default = "127.0.0.1:5353"
+        help="simplex server for alerting",
+        default = "127.0.0.1:5353",
         dest="gen_config",
     )
 
     args = parser.parse_args()
 
-    if args.otel_server and args.pyroscope_server:
-        configure_telemetry(
-            "b2r2-licence-server",
-            args.otel_server,
-            args.pyroscope_server,
-            devMode=args.debug,
-        )
+    configure_telemetry(
+        "simplex-alerter",
+        args.otel_server,
+        args.pyroscope_server,
+        args.debug,
+        args.prometheus_config,
+    )
 
+    while True:
+        sleep(1)
