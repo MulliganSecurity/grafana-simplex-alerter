@@ -359,7 +359,7 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "0.1.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=lib#6d6a3804b544e2af5c192ceef6764c58107db613" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=lib#3b84f74ee01d4bb572f7b6dc6bc3053c8e13a325" }
 dependencies = [
     { name = "fastapi" },
     { name = "opentelemetry-api" },
