@@ -359,7 +359,7 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "1.0.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#0223d71edc67397828eca302026f0009a00caca4" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#0ed7d2a239ee8157eac9e68f4e95d0d35084870a" }
 dependencies = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },
@@ -866,6 +866,7 @@ dependencies = [
     { name = "opentelemetry-instrumentation-urllib" },
     { name = "opentelemetry-instrumentation-wsgi" },
     { name = "opentelemetry-sdk" },
+    { name = "prometheus-client" },
     { name = "pyyaml" },
     { name = "uvicorn" },
 ]
@@ -885,6 +886,7 @@ requires-dist = [
     { name = "opentelemetry-instrumentation-urllib", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-wsgi", specifier = ">=0.53b1" },
     { name = "opentelemetry-sdk", specifier = ">=1.33.1" },
+    { name = "prometheus-client", specifier = ">=0.22.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
     { name = "uvicorn", specifier = ">=0.34.2" },
 ]
