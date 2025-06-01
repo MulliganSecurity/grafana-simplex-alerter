@@ -26,4 +26,4 @@ dependencies = [
 simplex-alerter = "simplex_alerter:__main__.run"
 
 [tool.uv.sources]
-observlib = { git = "https://github.com/ForgottenBeast/observlib.git", subdirectory = "lib" }
+observlib = { git = "https://github.com/ForgottenBeast/observlib.git", subdirectory = "observlib" }
