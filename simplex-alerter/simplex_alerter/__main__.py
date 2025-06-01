@@ -36,6 +36,14 @@ def run():
         default=None,
     )
     parser.add_argument(
+        "-p",
+        "--port",
+        action="store",
+        help="port to run the app on",
+        dest="port",
+        default = 8080,
+    )
+    parser.add_argument(
         "-d",
         "--debug",
         action="store_true",
@@ -93,7 +101,7 @@ def run():
         args.otel_server,
         args.pyroscope_server,
         args.debug,
-        args.prometheus_config,
+        configure_provider = True
     )
 
     [host, port] = args.endpoint.split(":")

@@ -1,4 +1,4 @@
-from observlib import get_meter
+from opentelemetry import metrics
 from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
 
 AioHttpClientInstrumentor().instrument()
@@ -14,13 +14,19 @@ def get_metrics():
 
 def configure_metrics():
     global metrics
-    meter = get_meter()
+    meter = metrics.get_meter("simplex-alerter")
     metrics = {
-        "calls": meter.create_counter(
-            name="simplex_alerter_calls",
+        "successful_calls": meter.create_counter(
+            name="simplex_alerter_calls_success",
             unit="1",
             description="alerter webhook calls",
         ),
+        "failed_calls": meter.create_counter(
+            name="simplex_alerter_calls_errors",
+            unit="1",
+            description="alerter webhook calls errors",
+        ),
+
         "ws_messages": meter.create_counter(
             name="simplex_alerter_wsmessage_sent",
             unit="1",
