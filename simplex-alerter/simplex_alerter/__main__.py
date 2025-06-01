@@ -1,4 +1,4 @@
-from .api import get_app, set_local, set_endpoint
+from .webhook import get_app, set_local, set_endpoint
 import uvicorn
 from time import sleep
 import argparse
