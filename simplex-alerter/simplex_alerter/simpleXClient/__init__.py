@@ -2,3 +2,4 @@ from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrument
 
 AioHttpClientInstrumentor().instrument()
 
+from client import Client as Client

@@ -1,4 +1,4 @@
-from .webhook import get_app, set_local, set_endpoint
+from .webhook import get_app, set_local, set_endpoint, set_sname
 import uvicorn
 from time import sleep
 import argparse
@@ -14,9 +14,6 @@ def run():
         dest="addr",
         default="127.0.0.1",
         help="bind address",
-    )
-    parser.add_argument(
-        "-p", "--port", default=8080, action="store", dest="port", help="bind port"
     )
     parser.add_argument("-m","--metrics", action = "store", dest = "prometheus_config", default = "127.0.0.1:0", help = "interface and port to expose legacy prometheus metrics, port to 0 to disable, default 127.0.0.1:0")
     parser.add_argument(
@@ -95,18 +92,19 @@ def run():
 
 
     args = parser.parse_args()
+    sname = "simpleX-alerter"
 
     configure_telemetry(
-        "simplex-alerter",
+        sname,
         args.otel_server,
         args.pyroscope_server,
         args.debug,
-        configure_provider = True
     )
 
     [host, port] = args.endpoint.split(":")
 
     set_local(args.local)
+    set_sname(sname)
     set_endpoint(f"http://{args.endpoint}")
     app = get_app()
     uvicorn.run(app, host=host, port=int(port))
