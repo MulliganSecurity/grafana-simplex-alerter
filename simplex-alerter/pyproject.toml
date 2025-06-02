@@ -9,6 +9,8 @@ dependencies = [
     "aiohttp-socks>=0.10.1",
     "fastapi>=0.115.12",
     "observlib",
+    "opentelemetry-api>=1.33.1",
+    "opentelemetry-instrumentation-aiohttp-client>=0.54b1",
     "opentelemetry-instrumentation-asyncio>=0.53b1",
     "opentelemetry-instrumentation-dbapi>=0.53b1",
     "opentelemetry-instrumentation-fastapi>=0.54b1",

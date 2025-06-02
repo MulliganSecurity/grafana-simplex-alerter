@@ -359,7 +359,7 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "1.0.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#433668f38a1393a0349eed9194b75f1868aed9e6" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#d4f5e2c72ae54d278b38687a60e0dfeae6888441" }
 dependencies = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },
@@ -471,6 +471,22 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/c3/fd/5756aea3fdc5651b572d8aef7d94d22a0a36e49c8b12fcb78cb905ba8896/opentelemetry_instrumentation-0.54b1.tar.gz", hash = "sha256:7658bf2ff914b02f246ec14779b66671508125c0e4227361e56b5ebf6cef0aec", size = 28436, upload-time = "2025-05-16T19:03:22.223Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/f4/89/0790abc5d9c4fc74bd3e03cb87afe2c820b1d1a112a723c1163ef32453ee/opentelemetry_instrumentation-0.54b1-py3-none-any.whl", hash = "sha256:a4ae45f4a90c78d7006c51524f57cd5aa1231aef031eae905ee34d5423f5b198", size = 31019, upload-time = "2025-05-16T19:02:15.611Z" },
+]
+
+[[package]]
+name = "opentelemetry-instrumentation-aiohttp-client"
+version = "0.54b1"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation" },
+    { name = "opentelemetry-semantic-conventions" },
+    { name = "opentelemetry-util-http" },
+    { name = "wrapt" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/04/fe/535efdb090543cb8e23149271c3ef27e37d3862865c52e2b2b58f7b5cb8d/opentelemetry_instrumentation_aiohttp_client-0.54b1.tar.gz", hash = "sha256:c51c643a5587b9efce6c4cae0f5e2202a25fac69caa89643465f57d5d8ba3789", size = 13643, upload-time = "2025-05-16T19:03:27.156Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/e5/de/07f25301d57bb83f29ee1eb5503871bddc132d4362ff9897c605e8c54c04/opentelemetry_instrumentation_aiohttp_client-0.54b1-py3-none-any.whl", hash = "sha256:d9b53c04865e8a4c984c1330e4f1d5570bc28543833a4718cbe4265091ee0e71", size = 11661, upload-time = "2025-05-16T19:02:17.827Z" },
 ]
 
 [[package]]
@@ -857,6 +873,8 @@ dependencies = [
     { name = "aiohttp-socks" },
     { name = "fastapi" },
     { name = "observlib" },
+    { name = "opentelemetry-api" },
+    { name = "opentelemetry-instrumentation-aiohttp-client" },
     { name = "opentelemetry-instrumentation-asyncio" },
     { name = "opentelemetry-instrumentation-dbapi" },
     { name = "opentelemetry-instrumentation-fastapi" },
@@ -877,6 +895,8 @@ requires-dist = [
     { name = "aiohttp-socks", specifier = ">=0.10.1" },
     { name = "fastapi", specifier = ">=0.115.12" },
     { name = "observlib", git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib" },
+    { name = "opentelemetry-api", specifier = ">=1.33.1" },
+    { name = "opentelemetry-instrumentation-aiohttp-client", specifier = ">=0.54b1" },
     { name = "opentelemetry-instrumentation-asyncio", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-dbapi", specifier = ">=0.53b1" },
     { name = "opentelemetry-instrumentation-fastapi", specifier = ">=0.54b1" },
