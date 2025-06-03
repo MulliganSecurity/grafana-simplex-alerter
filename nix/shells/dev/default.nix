@@ -22,22 +22,19 @@ let
 in
 
 mkShell {
-  packages =
-    with pkgs;
-    [
-      python3Packages.bandit
-      (python313Packages.opentelemetry-instrumentation.overrideAttrs (old:
-        {
-            propagatedBuildInputs = old.propagatedBuildInputs ++ [ pkgs.python313Packages.packaging ];
-        }))# for bootstrap
-      deadnix
-      python313
-      pyright
-      ruff
-      statix
-      uv
-      vulnix
-    ];
+  packages = with pkgs; [
+    python3Packages.bandit
+    (python313Packages.opentelemetry-instrumentation.overrideAttrs (old: {
+      propagatedBuildInputs = old.propagatedBuildInputs ++ [ pkgs.python313Packages.packaging ];
+    })) # for bootstrap
+    deadnix
+    python313
+    pyright
+    ruff
+    statix
+    uv
+    vulnix
+  ];
   shellHook = ''
     # Undo dependency propagation by nixpkgs.
     unset PYTHONPATH

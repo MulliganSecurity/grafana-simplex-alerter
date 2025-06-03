@@ -1,0 +1,28 @@
+From 7fde0e4dbc504752cb8e14431de98c89fb237ccf Mon Sep 17 00:00:00 2001
+From: midas <dev@null>
+Date: Tue, 3 Jun 2025 13:28:00 +0200
+Subject: [PATCH] fix response parsing
+
+---
+ simpx/transport.py | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/simpx/transport.py b/simpx/transport.py
+index acf12a4..bcc8d1e 100644
+--- a/simpx/transport.py
++++ b/simpx/transport.py
+@@ -162,9 +162,9 @@ class ChatTransport(Transport[ChatSrvRequest, Union[ChatSrvResponse, ChatRespons
+             
+             try:
+                 json_data = json.loads(data)
+-                if json_data.get('resp', {}).get('type') and isinstance(json_data['resp']['type'], str):
++                if json_data.get('resp', {}).get('Right').get('type') and isinstance(json_data['resp']['Right']['type'], str):
+                     # Parse the response as a ChatResponse object
+-                    resp = ChatSrvResponse(json_data.get('corrId'), json_data['resp'])
++                    resp = ChatSrvResponse(json_data.get('corrId'), json_data['resp']['Right'])
+                 else:
+                     resp = ChatResponseError("Invalid response format", data)
+                 
+-- 
+2.49.0
+

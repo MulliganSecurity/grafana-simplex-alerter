@@ -45,8 +45,10 @@ rec {
         old.nativeBuildInputs
         ++ [ prev.pkgs.python313Packages.setuptools ]
         ++ (final.resolveBuildSystem { setuptools = [ ]; });
+      patches = [
+        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0001-fix-response-parsing.patch")
+      ];
     });
-
 
   };
 
