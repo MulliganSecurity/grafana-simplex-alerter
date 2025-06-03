@@ -40,6 +40,14 @@ rec {
         ++ (final.resolveBuildSystem { setuptools = [ ]; });
     });
 
+    simpx-py = prev.simpx-py.overrideAttrs (old: {
+      nativeBuildInputs =
+        old.nativeBuildInputs
+        ++ [ prev.pkgs.python313Packages.setuptools ]
+        ++ (final.resolveBuildSystem { setuptools = [ ]; });
+    });
+
+
   };
 
   # Use Python 3.12 from nixpkgs
