@@ -99,22 +99,32 @@ async def startup_event():
         for g in group_data["groups"][0]:
             if "groupProfile" in g:
                 groups[g["groupProfile"]["displayName"]] = g["groupId"]
-            else:
-                continue
 
+    update_required = False
     for group in config["alert_groups"]:
         if group["name"] in groups.keys():
             continue
 
         if "invite_link" in group:
+            update_required = True
             logger.info("joining group", extra={"group": group["name"]})
             span.add_event(
                 "joining group",
                 attributes={"message": "joining group", "group": group["name"]},
             )
             await client.api_connect(group["invite_link"])
+
+    updated_groups = {}
+    if update_required:
+        new_data = await client.api_get_groups()
+        if len(new_data["groups"]) > 0:
+            for g in new_data["groups"][0]:
+                if "groupProfile" in g and g["groupProfile"]["displayName"] not in updated_groups:
+                    updated_groups[g["groupProfile"]["displayName"]] = g["groupId"]
+
+
     app.state.simpleX = client
-    app.state.groups = groups
+    app.state.groups = groups | updated_groups
 
 
 @app.on_event("shutdown")
