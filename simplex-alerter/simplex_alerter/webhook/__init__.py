@@ -1,17 +1,18 @@
 import json
 import aiohttp
-from .config import get_config
+from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from observlib import traced
-from fastapi import FastAPI, Request,Response
+from fastapi import FastAPI, Request, HTTPException, Response
 from fastapi.responses import JSONResponse
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
 from opentelemetry import trace
 from simpx.client import ChatClient
-from simpx.command import GroupProfile
+from simpx.command import GroupProfile,ChatType,ComposedMessage
 from logging import getLogger
+from .request_models import Alert
 
 service_name = None
 
@@ -27,27 +28,24 @@ def set_sname(name):
     service_name = name
 
 @lru_cache(maxsize = None)
-def get_counter(name):
-    return get_meter(service_name).create_counter(name)
+def get_counter(counter_data):
+    return get_meter(service_name).create_counter(**dict(counter_data))
 
 @lru_cache(maxsize = None)
 def get_timer(timer_data):
-    return get_meter(service_name).create_histogram(**timer_data)
+    return get_meter(service_name).create_histogram(**dict(timer_data))
 
 def label_fn(result, error):
     if error.status_code >= 400 and error.status_code <= 400:
         return {"status":"4xx"}
-    return {"target_group":result["group"]}
-
-def metrics_labels(_result, _error):
-    return {"target":"/metrics"}
+    result.render()
+    data = json.loads(result.body.decode())
+    return {"target_group":data["group"]}
 
 traced_conf = {
         "counter" : "webhook_calls",
         "counter_factory" : get_counter,
         "tracer" : service_name,
-        "timing_histogram": {"name":"execution_timer","unit":"ms","description":"function execution duration"},
-        "timer_factory" : get_timer,
         "label_fn": label_fn
         }
 
@@ -62,7 +60,7 @@ def set_endpoint(endpoint):
 
 
 @app.on_event("startup")
-@traced(tracer = traced_conf["tracer"], )
+@traced(tracer = traced_conf["tracer"], timing_histogram = {"name":"execution_timer","unit":"ms","description":"function execution duration"}, timer_factory = get_timer )
 async def startup_event():
     global simplex_endpoint
     span = trace.get_current_span()
@@ -75,41 +73,48 @@ async def startup_event():
 
     span.add_event("retrieving connected groups")
     group_data = await client.api_get_groups()
-    group_names = []
-    span.add_event("identified groups",attributes = {"groupes":json.dumps(group_names)})
+    groups = {}
+    span.add_event("identified groups",attributes = {"groups":json.dumps(groups)})
 
     if len(group_data["groups"]) > 0:
         for g in group_data["groups"][0]:
             if "groupProfile" in g:
-                group_names.append(g["groupProfile"]["displayName"])
+                groups[g["groupProfile"]["displayName"]] = g["groupId"]
             else:
                 continue
 
     for group in config["alert_groups"]:
-        if group["name"] in group_names:
+        if group["name"] in groups.keys():
             continue
 
         if "invite_link" in group:
             l.info("joining group", extra = { "group":group["name"]})
             span.add_event("joining group",attributes = {"message": "joining group", "group":group["name"]})
             await client.api_connect(group["invite_link"])
-
     app.state.simpleX = client
+    app.state.groups = groups
+
 
 
 @app.on_event("shutdown")
-@traced(tracer = traced_conf["tracer"], timing_histogram = traced_conf["timing_histogram"], timer_factory = traced_conf["timer_factory"])
+@traced(tracer = traced_conf["tracer"])
 async def shutdown_event():
     pass
 
-@traced(counter ="metrics_call", counter_factory = get_counter, label_fn = metrics_labels)
 @app.get("/metrics")
+@traced(counter ="metrics_calls", counter_factory = get_counter)
 async def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
-@traced(**traced_conf)
 @app.post("/{endpoint:path}")
-async def post_message(message):
-    return Response(content=[{"status":"message sent","target_group":endpoint}])
+@traced(**traced_conf)
+async def post_message(endpoint: str,alert: Alert):
+    chatId = app.state.groups.get(endpoint)
+
+    if not chatId:
+        raise HTTPException(status_code=404)
+
+    await app.state.simpleX.api_send_text_message(ChatType.Group, chatId, f"{alert.title}\n{alert.message}")
+    return JSONResponse(content=json.dumps({"status":"message sent","target_group":endpoint}))
 
 FastAPIInstrumentor().instrument_app(app)
