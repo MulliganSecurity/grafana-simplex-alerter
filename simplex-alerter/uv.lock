@@ -346,7 +346,7 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "1.0.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#e038f99c5a7a5cfaa628d5b7752b455a3b9f2c04" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#b5a8a9e548fc48cacc5d80e86e4a87280c9de643" }
 dependencies = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },
@@ -355,6 +355,7 @@ dependencies = [
     { name = "opentelemetry-sdk" },
     { name = "pyroscope-io" },
     { name = "pyroscope-otel" },
+    { name = "python-json-logger" },
 ]
 
 [[package]]
@@ -811,6 +812,15 @@ wheels = [
 ]
 
 [[package]]
+name = "python-json-logger"
+version = "3.3.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/9e/de/d3144a0bceede957f961e975f3752760fbe390d57fbe194baf709d8f1f7b/python_json_logger-3.3.0.tar.gz", hash = "sha256:12b7e74b17775e7d565129296105bbe3910842d9d0eb083fc83a6a617aa8df84", size = 16642, upload-time = "2025-03-07T07:08:27.301Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/08/20/0f2523b9e50a8052bc6a8b732dfc8568abbdc42010aef03a2d750bdab3b2/python_json_logger-3.3.0-py3-none-any.whl", hash = "sha256:dd980fae8cffb24c13caf6e158d3d61c0d6d22342f932cb6e9deedab3d35eec7", size = 15163, upload-time = "2025-03-07T07:08:25.627Z" },
+]
+
+[[package]]
 name = "pyyaml"
 version = "6.0.2"
 source = { registry = "https://pypi.org/simple" }
@@ -897,14 +907,14 @@ requires-dist = [
     { name = "opentelemetry-sdk", specifier = ">=1.33.1" },
     { name = "prometheus-client", specifier = ">=0.22.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "simpx-py", git = "file:///home/urist/Documents/simpx-py" },
+    { name = "simpx-py", git = "https://github.com/FailSpy/simpx-py" },
     { name = "uvicorn", specifier = ">=0.34.2" },
 ]
 
 [[package]]
 name = "simpx-py"
 version = "0.1.0"
-source = { git = "file:///home/urist/Documents/simpx-py#924d61f0752fd36fa0cccb124fb42dbb5717e1d2" }
+source = { git = "https://github.com/FailSpy/simpx-py#15426d13e8ad84935347e98f56c0cadb33945e8c" }
 dependencies = [
     { name = "qrcode" },
     { name = "websockets" },
