@@ -124,7 +124,7 @@ async def shutdown_event():
 
 
 @app.get("/metrics")
-@traced(counter="metrics_calls", counter_factory=get_counter)
+@traced(tracer=traced_conf["tracer"],counter="metrics_calls", counter_factory=get_counter)
 async def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
