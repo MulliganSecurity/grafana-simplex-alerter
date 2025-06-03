@@ -121,6 +121,7 @@ async def startup_event():
             for g in new_data["groups"][0]:
                 if "groupProfile" in g and g["groupProfile"]["displayName"] not in updated_groups:
                     updated_groups[g["groupProfile"]["displayName"]] = g["groupId"]
+        span.add_event("updated groups",attributes = {"groups":json.dumps(updated_groups)})
 
 
     app.state.simpleX = client
