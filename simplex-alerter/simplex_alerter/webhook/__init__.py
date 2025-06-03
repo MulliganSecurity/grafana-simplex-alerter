@@ -70,6 +70,15 @@ def set_endpoint(endpoint):
     simplex_endpoint = endpoint
 
 
+async def get_groups(group_data):
+    groups = {}
+    if len(group_data["groups"]) > 0:
+        for g in group_data["groups"][0]:
+            if "groupProfile" in g:
+                groups[g["groupProfile"]["displayName"]] = g["groupId"]
+    return groups
+
+
 @app.on_event("startup")
 @traced(
     tracer=traced_conf["tracer"],
@@ -90,42 +99,18 @@ async def startup_event():
     client = await ChatClient.create(simplex_endpoint)
     config = get_config()
 
-    span.add_event("retrieving connected groups")
-    group_data = await client.api_get_groups()
-    groups = {}
-    span.add_event("identified groups", attributes={"groups": json.dumps(groups)})
-
-    if len(group_data["groups"]) > 0:
-        for g in group_data["groups"][0]:
-            if "groupProfile" in g:
-                groups[g["groupProfile"]["displayName"]] = g["groupId"]
-
-    update_required = False
+    groups = await get_groups(await client.api_get_groups())
     for group in config["alert_groups"]:
         if group["name"] in groups.keys():
             continue
 
         if "invite_link" in group:
-            update_required = True
             logger.info("joining group", extra={"group": group["name"]})
             span.add_event(
                 "joining group",
                 attributes={"message": "joining group", "group": group["name"]},
             )
             await client.api_connect(group["invite_link"])
-
-    updated_groups = {}
-    if update_required:
-        new_data = await client.api_get_groups()
-        if len(new_data["groups"]) > 0:
-            for g in new_data["groups"][0]:
-                if "groupProfile" in g and g["groupProfile"]["displayName"] not in updated_groups:
-                    updated_groups[g["groupProfile"]["displayName"]] = g["groupId"]
-        span.add_event("updated groups",attributes = {"groups":json.dumps(updated_groups)})
-
-
-    app.state.simpleX = client
-    app.state.groups = groups | updated_groups
 
 
 @app.on_event("shutdown")
@@ -135,7 +120,9 @@ async def shutdown_event():
 
 
 @app.get("/metrics")
-@traced(tracer=traced_conf["tracer"],counter="metrics_calls", counter_factory=get_counter)
+@traced(
+    tracer=traced_conf["tracer"], counter="metrics_calls", counter_factory=get_counter
+)
 async def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
@@ -145,15 +132,20 @@ async def metrics():
 async def post_message(endpoint: str, alert: Alert):
     span = trace.get_current_span()
     logger = getLogger(service_name)
-    chatId = app.state.groups.get(endpoint)
+    global simplex_endpoint
+    span.add_event("creating client")
+    client = await ChatClient.create(simplex_endpoint)
+    span.add_event("getting latest groups")
+    groups = await get_groups(await client.api_get_groups())
+    chatId = groups.get(endpoint)
 
     if not chatId:
         logger.error(f"chat group {endpoint} not found")
-        span.add_event("chat group not found",attributes = {"target_group":endpoint, "valid_groups":json.dumps(app.state.groups)})
-
+        span.add_event("group not found")
         raise HTTPException(status_code=404)
 
-    await app.state.simpleX.api_send_text_message(
+    span.add_event("sending message")
+    await client.api_send_text_message(
         ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
     )
     return JSONResponse(content={"status": "message sent", "target_group": endpoint})
