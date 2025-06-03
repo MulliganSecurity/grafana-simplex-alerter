@@ -2,7 +2,7 @@
 FROM nixos/nix
 
 # Enable flakes and experimental features
-ENV NIX_CONFIG 'experimental-features = nix-command flakes'
+ENV NIX_CONFIG='experimental-features = nix-command flakes'
 
 # Copy the flake repo into the image
 COPY . /app
