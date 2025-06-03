@@ -30,4 +30,4 @@ simplex-alerter = "simplex_alerter:__main__.run"
 
 [tool.uv.sources]
 observlib = { git = "https://github.com/ForgottenBeast/observlib.git", subdirectory = "observlib" }
-simpx-py = { git = "https://github.com/FailSpy/simpx-py" }
+simpx-py = { git = "file:///home/urist/Documents/simpx-py" }

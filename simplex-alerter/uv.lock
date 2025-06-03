@@ -897,14 +897,14 @@ requires-dist = [
     { name = "opentelemetry-sdk", specifier = ">=1.33.1" },
     { name = "prometheus-client", specifier = ">=0.22.0" },
     { name = "pyyaml", specifier = ">=6.0.2" },
-    { name = "simpx-py", git = "https://github.com/FailSpy/simpx-py" },
+    { name = "simpx-py", git = "file:///home/urist/Documents/simpx-py" },
     { name = "uvicorn", specifier = ">=0.34.2" },
 ]
 
 [[package]]
 name = "simpx-py"
 version = "0.1.0"
-source = { git = "https://github.com/FailSpy/simpx-py#15426d13e8ad84935347e98f56c0cadb33945e8c" }
+source = { git = "file:///home/urist/Documents/simpx-py#924d61f0752fd36fa0cccb124fb42dbb5717e1d2" }
 dependencies = [
     { name = "qrcode" },
     { name = "websockets" },
