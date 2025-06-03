@@ -1,3 +1,5 @@
-from opentelemetry.instrumentation.aiohttp_client import AioHttpClientInstrumentor
+from opentelemetry.instrumentation.asyncio import AsyncioInstrumentor
+from opentelemetry.instrumentation.threading import ThreadingInstrumentor
 
-AioHttpClientInstrumentor().instrument()
+ThreadingInstrumentor().instrument()
+AsyncioInstrumentor().instrument()
