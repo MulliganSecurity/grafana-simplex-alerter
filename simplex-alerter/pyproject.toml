@@ -5,24 +5,18 @@ description = "webhook based simpleX alerter"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "aiohttp>=3.12.4",
     "fastapi>=0.115.12",
     "observlib",
     "simpx-py",
     "opentelemetry-api>=1.33.1",
-    "opentelemetry-instrumentation-aiohttp-client>=0.54b1",
     "opentelemetry-instrumentation-asyncio>=0.53b1",
-    "opentelemetry-instrumentation-dbapi>=0.53b1",
     "opentelemetry-instrumentation-fastapi>=0.54b1",
-    "opentelemetry-instrumentation-logging>=0.53b1",
-    "opentelemetry-instrumentation-sqlite3>=0.53b1",
     "opentelemetry-instrumentation-threading>=0.53b1",
-    "opentelemetry-instrumentation-urllib>=0.53b1",
-    "opentelemetry-instrumentation-wsgi>=0.53b1",
     "opentelemetry-sdk>=1.33.1",
     "prometheus-client>=0.22.0",
     "pyyaml>=6.0.2",
     "uvicorn>=0.34.2",
+    "opentelemetry-instrumentation-asgi>=0.54b1",
 ]
 
 [project.scripts]
