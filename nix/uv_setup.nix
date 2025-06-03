@@ -47,6 +47,8 @@ rec {
         ++ (final.resolveBuildSystem { setuptools = [ ]; });
       patches = [
         (lib.snowfall.fs.get-file "nix/packages/${package_name}/0001-fix-response-parsing.patch")
+        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0002-add-apiget-groups-command.patch")
+        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0003-patch-getchats-command.patch")
       ];
     });
 
