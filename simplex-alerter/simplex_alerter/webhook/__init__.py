@@ -35,12 +35,19 @@ def get_counter(counter_data):
 def get_timer(timer_data):
     return get_meter(service_name).create_histogram(**dict(timer_data))
 
-def label_fn(result, error):
-    if error.status_code >= 400 and error.status_code <= 400:
-        return {"status":"4xx"}
-    result.render()
-    data = json.loads(result.body.decode())
-    return {"target_group":data["group"]}
+def label_fn(result,error):
+    if error:
+        if error.status_code >= 400 and error.status_code <= 500:
+            return {"status":"4xx"}
+        else:
+            return {"status":"5xx"}
+    if result:
+        try:
+            res = json.loads(result.body)
+            return res
+        except Exception as ex:
+            return {"badlabel":ex}
+    return {}
 
 traced_conf = {
         "counter" : "webhook_calls",
@@ -115,6 +122,6 @@ async def post_message(endpoint: str,alert: Alert):
         raise HTTPException(status_code=404)
 
     await app.state.simpleX.api_send_text_message(ChatType.Group, chatId, f"{alert.title}\n{alert.message}")
-    return JSONResponse(content=json.dumps({"status":"message sent","target_group":endpoint}))
+    return JSONResponse(content={"status":"message sent","target_group":endpoint})
 
 FastAPIInstrumentor().instrument_app(app)
