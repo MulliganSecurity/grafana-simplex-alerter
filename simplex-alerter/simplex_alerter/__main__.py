@@ -1,6 +1,5 @@
-from .webhook import get_app, set_local, set_endpoint, set_sname
+from .webhook import get_app, set_endpoint, set_sname
 import uvicorn
-from time import sleep
 import argparse
 from observlib import configure_telemetry
 from .config import generate_config, load_config
@@ -33,12 +32,12 @@ def run():
         default=None,
     )
     parser.add_argument(
-        "-p",
-        "--port",
+        "-b",
+        "--bind-addr",
         action="store",
-        help="port to run the app on",
-        dest="port",
-        default = 8080,
+        help="host:port to run the app on",
+        dest="bind_addr",
+        default = "127.0.0.1:7898",
     )
     parser.add_argument(
         "-d",
@@ -46,14 +45,6 @@ def run():
         action="store_true",
         help="enable debug mode, increases pyroscope sampling rate if configured",
         dest="debug",
-    )
-
-    parser.add_argument(
-        "-l",
-        "--local",
-        action="store_true",
-        help="enable local mode, simplex connections won't be run through tor",
-        dest="local",
     )
 
     parser.add_argument(
@@ -67,17 +58,8 @@ def run():
     parser.add_argument(
         "-g",
         "--generate-config",
-        action="store",
+        action="store_true",
         help="generate config file with placeholder values",
-        dest="gen_config",
-    )
-
-    parser.add_argument(
-        "-s",
-        "--simplex-ws-server",
-        action="store",
-        help="simplex server for alerting",
-        default = "127.0.0.1:5353",
         dest="gen_config",
     )
 
@@ -85,14 +67,22 @@ def run():
         "-e",
         "--endpoint",
         action="store",
-        help="endpoint to receive webhook calls (default 127.0.0.1:7897)",
+        help="simplex endpoint",
         default = "127.0.0.1:7897",
         dest="endpoint",
     )
 
-
     args = parser.parse_args()
+
+    if args.gen_config:
+        generate_config()
+        return
+    if not args.config:
+        print("config file required")
+        return
+
     sname = "simpleX-alerter"
+    load_config(args.config)
 
     configure_telemetry(
         sname,
@@ -101,10 +91,9 @@ def run():
         args.debug,
     )
 
-    [host, port] = args.endpoint.split(":")
+    [host, port] = args.bind_addr.split(":")
 
-    set_local(args.local)
     set_sname(sname)
-    set_endpoint(f"http://{args.endpoint}")
+    set_endpoint(f"ws://{args.endpoint}")
     app = get_app()
     uvicorn.run(app, host=host, port=int(port))
