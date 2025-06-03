@@ -4,6 +4,7 @@ import argparse
 from observlib import configure_telemetry
 from .config import generate_config, load_config
 
+
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -14,7 +15,14 @@ def run():
         default="127.0.0.1",
         help="bind address",
     )
-    parser.add_argument("-m","--metrics", action = "store", dest = "prometheus_config", default = "127.0.0.1:0", help = "interface and port to expose legacy prometheus metrics, port to 0 to disable, default 127.0.0.1:0")
+    parser.add_argument(
+        "-m",
+        "--metrics",
+        action="store",
+        dest="prometheus_config",
+        default="127.0.0.1:0",
+        help="interface and port to expose legacy prometheus metrics, port to 0 to disable, default 127.0.0.1:0",
+    )
     parser.add_argument(
         "-o",
         "--opentelemetry",
@@ -37,7 +45,7 @@ def run():
         action="store",
         help="host:port to run the app on",
         dest="bind_addr",
-        default = "127.0.0.1:7898",
+        default="127.0.0.1:7898",
     )
     parser.add_argument(
         "-d",
@@ -68,7 +76,7 @@ def run():
         "--endpoint",
         action="store",
         help="simplex endpoint",
-        default = "127.0.0.1:7897",
+        default="127.0.0.1:7897",
         dest="endpoint",
     )
 
