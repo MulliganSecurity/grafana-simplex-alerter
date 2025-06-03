@@ -132,9 +132,14 @@ async def metrics():
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
 async def post_message(endpoint: str, alert: Alert):
+    span = trace.get_current_span()
+    logger = getLogger(service_name)
     chatId = app.state.groups.get(endpoint)
 
     if not chatId:
+        logger.error(f"chat group {endpoint} not found")
+        span.add_event("chat group not found",attributes = {"target_group":endpoint, "valid_groups":json.dumps(app.state.groups)})
+
         raise HTTPException(status_code=404)
 
     await app.state.simpleX.api_send_text_message(
