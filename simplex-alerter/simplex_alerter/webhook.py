@@ -1,3 +1,4 @@
+import json
 import aiohttp
 from .config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -7,6 +8,7 @@ from fastapi.responses import JSONResponse
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
+from opentelemetry import trace
 from simpx.client import ChatClient
 from simpx.command import GroupProfile
 from logging import getLogger
@@ -41,7 +43,7 @@ def metrics_labels(_result, _error):
     return {"target":"/metrics"}
 
 traced_conf = {
-        "counter" : "webhook_call",
+        "counter" : "webhook_calls",
         "counter_factory" : get_counter,
         "tracer" : service_name,
         "timing_histogram": {"name":"execution_timer","unit":"ms","description":"function execution duration"},
@@ -63,24 +65,33 @@ def set_endpoint(endpoint):
 @traced(tracer = traced_conf["tracer"], )
 async def startup_event():
     global simplex_endpoint
+    span = trace.get_current_span()
     l = getLogger(service_name)
+
+    span.add_event("initializing client",attributes = {"endpoint":simplex_endpoint})
+    l.info("initializing client",extra = {"endpoint":simplex_endpoint})
     client = await ChatClient.create(simplex_endpoint)
     config = get_config()
 
+    span.add_event("retrieving connected groups")
     group_data = await client.api_get_groups()
     group_names = []
-    for g in group_data["groups"][0]:
-        if "groupProfile" in g:
-            group_names.append(g["groupProfile"]["displayName"])
-        else:
-            continue
+    span.add_event("identified groups",attributes = {"groupes":json.dumps(group_names)})
+
+    if len(group_data["groups"]) > 0:
+        for g in group_data["groups"][0]:
+            if "groupProfile" in g:
+                group_names.append(g["groupProfile"]["displayName"])
+            else:
+                continue
 
     for group in config["alert_groups"]:
         if group["name"] in group_names:
             continue
 
         if "invite_link" in group:
-            l.info({"message": "joining group", "group":group["name"]})
+            l.info("joining group", extra = { "group":group["name"]})
+            span.add_event("joining group",attributes = {"message": "joining group", "group":group["name"]})
             await client.api_connect(group["invite_link"])
 
     app.state.simpleX = client
