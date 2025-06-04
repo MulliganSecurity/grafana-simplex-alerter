@@ -8,22 +8,6 @@ from .config import generate_config, load_config
 def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "-a",
-        "--address",
-        action="store",
-        dest="addr",
-        default="127.0.0.1",
-        help="bind address",
-    )
-    parser.add_argument(
-        "-m",
-        "--metrics",
-        action="store",
-        dest="prometheus_config",
-        default="127.0.0.1:0",
-        help="interface and port to expose legacy prometheus metrics, port to 0 to disable, default 127.0.0.1:0",
-    )
-    parser.add_argument(
         "-o",
         "--opentelemetry",
         action="store",
