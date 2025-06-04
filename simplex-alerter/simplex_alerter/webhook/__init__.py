@@ -65,9 +65,11 @@ def set_endpoint(endpoint):
 async def get_groups(group_data):
     groups = {}
     if len(group_data["groups"]) > 0:
-        for g in group_data["groups"][0]:
-            if "groupProfile" in g:
-                groups[g["groupProfile"]["displayName"]] = g["groupId"]
+        for group_data_entry in group_data["groups"]:
+            if "groupProfile" in group_data_entry[0]:
+                groups[group_data_entry[0]["groupProfile"]["displayName"]] = (
+                    group_data_entry[0]["groupId"]
+                )
     return groups
 
 
@@ -137,7 +139,9 @@ async def post_message(endpoint: str, alert: Alert):
         raise HTTPException(status_code=404)
 
     span.add_event("sending message")
-    logger.info("sending message", extra = {"alert":alert.message, "target_group":endpoint})
+    logger.info(
+        "sending message", extra={"alert": alert.message, "target_group": endpoint}
+    )
     await client.api_send_text_message(
         ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
     )
