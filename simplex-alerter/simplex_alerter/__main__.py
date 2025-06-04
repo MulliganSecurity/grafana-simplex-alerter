@@ -1,4 +1,4 @@
-from .webhook import get_app, set_endpoint, set_sname
+from .webhook import get_app, set_endpoint
 import uvicorn
 import argparse
 from observlib import configure_telemetry
@@ -101,7 +101,6 @@ def run():
 
     [host, port] = args.bind_addr.split(":")
 
-    set_sname(sname)
     set_endpoint(f"ws://{args.endpoint}")
     app = get_app()
     uvicorn.run(app, host=host, port=int(port))

@@ -196,7 +196,7 @@ wheels = [
 [[package]]
 name = "observlib"
 version = "1.0.0"
-source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#13cdf67f96f6ec8902a661e09c569329a1fdb661" }
+source = { git = "https://github.com/ForgottenBeast/observlib.git?subdirectory=observlib#52418033aecbd7a2036ef0744f68df9058f3975a" }
 dependencies = [
     { name = "opentelemetry-api" },
     { name = "opentelemetry-exporter-otlp" },

@@ -13,18 +13,13 @@ from simpx.command import ChatType
 from logging import getLogger
 from .request_models import Alert
 
-service_name = None
+service_name = "simpleX-alerter"
 
 
 app = FastAPI()
 
 
 simplex_endpoint = None
-
-
-def set_sname(name):
-    global service_name
-    service_name = name
 
 
 @lru_cache(maxsize=None)
@@ -44,11 +39,8 @@ def label_fn(result, error):
         else:
             return {"status": "5xx"}
     if result:
-        try:
-            res = json.loads(result.body)
-            return res
-        except Exception as ex:
-            return {"badlabel": ex}
+        res = json.loads(result.body)
+        return res
     return {}
 
 
@@ -145,6 +137,7 @@ async def post_message(endpoint: str, alert: Alert):
         raise HTTPException(status_code=404)
 
     span.add_event("sending message")
+    logger.info("sending message", extra = {"alert":alert.message, "target_group":endpoint})
     await client.api_send_text_message(
         ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
     )
