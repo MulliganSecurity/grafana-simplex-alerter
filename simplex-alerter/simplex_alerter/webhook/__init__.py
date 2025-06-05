@@ -150,7 +150,7 @@ async def post_message(endpoint: str, alert: Union[Alert, dict]):
             ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
         )
     else:
-        await client.api_send_text_message(ChatType.Group, chatId, json.dumps(alert))
+        await client.api_send_text_message(ChatType.Group, chatId, json.dumps(alert,indent = 4))
 
     return JSONResponse(content={"status": "message sent", "target_group": endpoint})
 
