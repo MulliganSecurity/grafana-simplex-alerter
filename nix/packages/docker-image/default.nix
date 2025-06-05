@@ -30,7 +30,7 @@ pkgs.dockerTools.buildImage {
         pathsToLink = [ "/bin" ];
     };
     config = {
-        ExposedPorts."7898" = {};
+        ExposedPorts."3334" = {};
         EntryPoint = ["${pkgs.${namespace}.simplex-alerter}/bin/simplex-alerter" ];
     };
 }
