@@ -1,4 +1,5 @@
 import json
+from typing import Union
 from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from observlib import traced
@@ -123,7 +124,7 @@ async def metrics():
 
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
-async def post_message(endpoint: str, alert: Alert):
+async def post_message(endpoint: str, alert: Union(Alert, dict)):
     span = trace.get_current_span()
     logger = getLogger(service_name)
     global simplex_endpoint
@@ -139,12 +140,18 @@ async def post_message(endpoint: str, alert: Alert):
         raise HTTPException(status_code=404)
 
     span.add_event("sending message")
-    logger.info(
-        "sending message", extra={"alert": alert.message, "target_group": endpoint}
-    )
-    await client.api_send_text_message(
-        ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
-    )
+
+    if isinstance(alert, Alert):
+        logger.info(
+            "sending grafana alert",
+            extra={"alert": alert.message, "target_group": endpoint},
+        )
+        await client.api_send_text_message(
+            ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
+        )
+    else:
+        await client.api_send_text_message(ChatType.Group, chatId, json.dumps(alert))
+
     return JSONResponse(content={"status": "message sent", "target_group": endpoint})
 
 
