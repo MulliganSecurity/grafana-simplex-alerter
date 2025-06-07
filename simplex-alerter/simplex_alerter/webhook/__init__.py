@@ -12,7 +12,7 @@ from opentelemetry import trace
 from simpx.client import ChatClient
 from simpx.command import ChatType
 from logging import getLogger
-from .request_models import Alert
+from .request_models import KnownModels
 
 service_name = "simpleX-alerter"
 
@@ -125,7 +125,7 @@ async def metrics():
 
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
-async def post_message(endpoint: str, alert: Union[Alert, dict]):
+async def post_message(endpoint: str, alert: Union[KnownModels, dict]):
     span = trace.get_current_span()
     logger = getLogger(service_name)
     global simplex_endpoint
@@ -142,15 +142,16 @@ async def post_message(endpoint: str, alert: Union[Alert, dict]):
 
     span.add_event("sending message")
 
-    if isinstance(alert, Alert):
+    if isinstance(alert, KnownModels):
         logger.info(
-            "sending grafana alert",
+            "sending alert",
             extra={"alert": alert.message, "target_group": endpoint},
         )
         await client.api_send_text_message(
-            ChatType.Group, chatId, f"{alert.title}\n{alert.message}"
-        )
+            ChatType.Group, chatId, alert.render() 
+            )
     else:
+        logger.info("unknown alert model, sending raw json", extra = {"content":alert})
         await client.api_send_text_message(ChatType.Group, chatId, json.dumps(alert,indent = 4))
 
     return JSONResponse(content={"status": "message sent", "target_group": endpoint})
