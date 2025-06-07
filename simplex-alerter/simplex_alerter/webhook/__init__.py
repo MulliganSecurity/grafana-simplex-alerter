@@ -50,6 +50,7 @@ traced_conf = {
     "counter_factory": get_counter,
     "tracer": service_name,
     "label_fn": label_fn,
+    "func_name_as_label": True,
 }
 
 
