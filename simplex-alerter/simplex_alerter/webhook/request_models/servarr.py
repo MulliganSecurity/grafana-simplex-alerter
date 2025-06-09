@@ -17,7 +17,7 @@ class SonarrAlert(BaseModel):
     series: dict
 
     def __init__(self, *args, **kwargs):
-        self.template = '''
+        self.template = """
 {eventType}
 
 {seriesTitle}
