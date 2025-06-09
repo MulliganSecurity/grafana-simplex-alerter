@@ -4,7 +4,6 @@ from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from observlib import traced
 from fastapi import FastAPI, HTTPException, Response
-from fastapi.responses import JSONResponse
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
@@ -33,16 +32,12 @@ def get_timer(timer_data):
     return get_meter(service_name).create_histogram(**dict(timer_data))
 
 
-def label_fn(result, error):
+def label_fn(result, error, func_args, func_kwargs=None):
+    result = {"group": func_args[0], "alert_type": func_args[1]}
     if error:
-        if error.status_code >= 400 and error.status_code <= 500:
-            return {"status": "4xx"}
-        else:
-            return {"status": "5xx"}
-    if result:
-        res = json.loads(result.body)
-        return res
-    return {}
+        code_family = error.status_code // 100
+        result |= {"status": f"{code_family}xx"}
+    return result
 
 
 traced_conf = {
@@ -147,14 +142,14 @@ async def post_message(endpoint: str, alert: Union[KnownModels, dict]):
             "sending alert",
             extra={"alert": alert.message, "target_group": endpoint},
         )
-        await client.api_send_text_message(
-            ChatType.Group, chatId, alert.render() 
-            )
+        await client.api_send_text_message(ChatType.Group, chatId, alert.render())
     else:
-        logger.info("unknown alert model, sending raw json", extra = {"content":alert})
-        await client.api_send_text_message(ChatType.Group, chatId, json.dumps(alert,indent = 4))
+        logger.info("unknown alert model, sending raw json", extra={"content": alert})
+        await client.api_send_text_message(
+            ChatType.Group, chatId, json.dumps(alert, indent=4)
+        )
 
-    return JSONResponse(content={"status": "message sent", "target_group": endpoint})
+    return Response()
 
 
 FastAPIInstrumentor().instrument_app(app)
