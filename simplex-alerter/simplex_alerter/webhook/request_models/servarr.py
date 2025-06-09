@@ -16,8 +16,8 @@ class SonarrAlert(BaseModel):
     episodes: list
     series: dict
 
-    def __init__(self):
-        self.template = """
+    def __init__(self, *args, **kwargs):
+        self.template = '''
 {eventType}
 
 {seriesTitle}
