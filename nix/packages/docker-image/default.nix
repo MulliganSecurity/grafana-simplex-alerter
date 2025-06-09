@@ -20,17 +20,46 @@ let
     package_name = namespace;
   };
   env = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
+  simplex-chat = pkgs.stdenv.mkDerivation {
+    name = "simplex-chat";
+    version = "v6.3.4";
+    src = pkgs.fetchurl {
+      url = "https://github.com/simplex-chat/simplex-chat/releases/download/v6.3.4/simplex-chat-ubuntu-24_04-x86-64";
+      hash = "sha256-8A2jqRaRYy7okGDD8Q8Gx7ZttxXhcSDsFRKvvdbyZHc=";
+    };
+    dontBuild = true;
+    dontUnpack = true;
+    installPhase = "mkdir -p $out/bin; cp $src $out/bin/simplex-chat; chmod +x $out/bin/simplex-chat";
+  };
+  ubuntu = pkgs.dockerTools.pullImage {
+    imageName = "ubuntu";
+    imageDigest = "sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f";
+    finalImageName = "ubuntu";
+    sha256 = "sha256-YdbJusA6R6SRxpoMZzQI/F0XoIw2cQKlz4FMvbAHGoA=";
+  };
+  start_services = pkgs.writeScriptBin "start-script.sh" ''
+    /bin/simplex-chat -p 7897 -d /simplex/chatDB &
+    /bin/simplex-alerter -b 0.0.0.0:7898 -c /alerterconfig/config.yml -e 127.0.0.1:7897 '';
+
 in
 pkgs.dockerTools.buildImage {
-    name = "simplex-alerter";
-    tag = "latest";
-    copyToRoot = pkgs.buildEnv {
-        name = "image-root";
-        paths = [ env ];
-        pathsToLink = [ "/bin" ];
-    };
-    config = {
-        ExposedPorts."3334" = {};
-        EntryPoint = ["${pkgs.${namespace}.simplex-alerter}/bin/simplex-alerter" ];
-    };
+  name = "simplex-chat";
+  tag = "latest";
+  fromImage = ubuntu;
+  copyToRoot = pkgs.buildEnv {
+    name = "image-root";
+    paths = [
+      pkgs.${namespace}.simplex-alerter
+      simplex-chat
+      start_services
+    ];
+    pathsToLink = [ "/bin" ];
+  };
+  config = {
+    ExposedPorts."7898" = { };
+    EntryPoint = [
+      "bash"
+      "start-script.sh"
+    ];
+  };
 }

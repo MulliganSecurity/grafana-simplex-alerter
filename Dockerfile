@@ -2,9 +2,6 @@ FROM nixos/nix
 
 ENV NIX_CONFIG='experimental-features = nix-command flakes'
 
-COPY . /app
-WORKDIR /app
+WORKDIR /src
 
-RUN nix build
-
-ENTRYPOINT ["/app/result/bin/simplex-alerter"]
+CMD nix build .\#docker-image
