@@ -20,10 +20,15 @@ class SonarrAlert(BaseModel):
         self.template = """
 {eventType}
 
-{seriesTitle}:
+{seriesTitle}
+
+{$ for i in series.images%}
+{% if i["coverType"] == "poster"%}
+{{i["remoteUrl"]}}
+{%endfor%}
 
 {% for ep in episodes %}
-- S{{ep.seasonNumber}}E{{ep.episodeNumber}}
+- S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
 {%endfor%}
 """
 
