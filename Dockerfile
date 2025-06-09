@@ -4,4 +4,4 @@ ENV NIX_CONFIG='experimental-features = nix-command flakes'
 
 WORKDIR /src
 
-CMD nix build .\#docker-image
+CMD nix build .\#docker-image && cp result simplex-alerter.tar.gz
