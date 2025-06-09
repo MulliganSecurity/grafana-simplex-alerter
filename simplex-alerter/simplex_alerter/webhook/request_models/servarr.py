@@ -35,7 +35,6 @@ class SonarrAlert(BaseModel):
     series: dict
     episodes: list
     eventType: str
-    downloadClient: Optional[str]
     instanceName: Optional[str]
     applicationUrl: Optional[str]
     customFormatInfo: Optional[dict]
@@ -44,11 +43,12 @@ class SonarrAlert(BaseModel):
     downloadId: Optional[str]
     release: Optional[dict]
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.template = """
 {eventType}
 
-{seriesTitle}
+{series.title}
 
 {$ for i in series.images%}
 {% if i["coverType"] == "poster"%}
@@ -62,7 +62,7 @@ class SonarrAlert(BaseModel):
 
     def render(self):
         template = Environment.from_string(self.template)
-        return template.render(self.__dict__)
+        return template.render(self.model_dump())
 
 
 ServarrAlert = Union[SonarrAlert]
