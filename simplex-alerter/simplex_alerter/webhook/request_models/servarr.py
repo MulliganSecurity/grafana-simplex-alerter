@@ -50,8 +50,8 @@ class SonarrAlert(BaseModel):
 
 {series.title}
 
-{$ for i in series.images%}
-{% if i["coverType"] == "poster"%}
+{% for i in series.images%}
+{% if i["coverType"] == "poster" %}
 {{i["remoteUrl"]}}
 {%endfor%}
 
