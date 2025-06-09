@@ -1,20 +1,48 @@
 from jinja2 import Environment
 from pydantic import BaseModel
-from typing import Union
+from typing import Union, Optional
 
+{
+    "series": {
+        "id": 1,
+        "title": "Test Title",
+        "path": "C:\\testpath",
+        "tvdbId": 1234,
+        "tvMazeId": 0,
+        "tmdbId": 0,
+        "type": "standard",
+        "year": 0,
+        "tags": [
+            "test-tag"
+        ]
+    },
+    "episodes": [
+        {
+            "id": 123,
+            "episodeNumber": 1,
+            "seasonNumber": 1,
+            "title": "Test title",
+            "seriesId": 0,
+            "tvdbId": 0
+        }
+    ],
+    "eventType": "Test",
+    "instanceName": "Sonarr",
+    "applicationUrl": ""
+}
 
 class SonarrAlert(BaseModel):
-    downloadClient: str
-    eventType: str
-    instanceName: str
-    applicationUrl: str
-    customFormatInfo: dict
-    downloadClient: str
-    downloadClientType: str
-    downloadId: str
-    release: dict
-    episodes: list
     series: dict
+    episodes: list
+    eventType: str
+    downloadClient: Optional[str]
+    instanceName: Optional[str]
+    applicationUrl: Optional[str]
+    customFormatInfo: Optional[dict]
+    downloadClient: Optional[str]
+    downloadClientType: Optional[str]
+    downloadId: Optional[str]
+    release: Optional[dict]
 
     def __init__(self, *args, **kwargs):
         self.template = """
