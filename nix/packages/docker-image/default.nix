@@ -43,7 +43,7 @@ let
 
 in
 pkgs.dockerTools.buildImage {
-  name = "simplex-chat";
+  name = "simplex-alerter";
   tag = "latest";
   fromImage = ubuntu;
   copyToRoot = pkgs.buildEnv {
