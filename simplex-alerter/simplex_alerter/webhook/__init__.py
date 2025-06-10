@@ -3,7 +3,7 @@ from typing import Union
 from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from observlib import traced
-from fastapi import FastAPI, HTTPException, Response
+from fastapi import FastAPI, HTTPException, Response,Request
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
