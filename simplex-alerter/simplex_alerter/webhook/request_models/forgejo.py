@@ -25,6 +25,8 @@ New content pushed to {{repository["full_name"]}} by {{head_commit["author"]["na
 
 {{head_commit["message"]}}""",
             enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
 
     async def render(self):
@@ -75,6 +77,8 @@ Unknown action: {{action}}
 
 """,
             enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
 
     async def render(self):
@@ -153,7 +157,12 @@ against {{pull_request["base"]["repo"]["full_name"]}}
             """
         else:
             template_text = json.dumps(kwargs)
-        self.template = Template(template_text, enable_async=True)
+        self.template = Template(
+            template_text,
+            enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
 
     async def render(self):
         return await self.template.render_async(**self.model_dump())
