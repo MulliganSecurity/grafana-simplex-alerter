@@ -45,7 +45,7 @@ class IssueCreated(BaseModel):
             """
 New issue opened!
 
-Issue #{{issue["id"}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}
+Issue #{{issue["id"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}
 
 {{issue["url"]}}
 
