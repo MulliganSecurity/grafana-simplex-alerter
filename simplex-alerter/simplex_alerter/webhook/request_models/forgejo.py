@@ -29,6 +29,7 @@ New content pushed to {{repository["full_name"}}!
     async def render(self):
         return await self.template.render_async(**self.model_dump())
 
+
 class IssueCreated(BaseModel):
     action: str
     number: int
