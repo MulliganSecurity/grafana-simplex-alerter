@@ -24,13 +24,14 @@ class SonarrAlert(BaseModel):
 {series.title}
 
 {% for i in series.images%}
-{% if i["coverType"] == "poster" %}
+    {% if i["coverType"] == "poster" %}
 {{i["remoteUrl"]}}
-{%endfor%}
+    {% endif %}
+{% endfor %}
 
 {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
-{%endfor%}
+{% endfor %}
 """, enable_async = True)
 
     async def render(self):
