@@ -27,18 +27,46 @@ New content pushed to {{repository["full_name"}}!
         )
 
     async def render(self):
-        return await self.template.render_async(self.model_dump())
+        return await self.template.render_async(**self.model_dump())
+
+class IssueCreated(BaseModel):
+    action: str
+    number: int
+    issue: dict
+    repository: dict
+    sender: dict
+    commit_id: str
+    template: str = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template = Template(
+            """
+New issue opened!
+
+Issue #{{issue["id"}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}
+
+{{issue["url"]}}
+
+was opened by {{issue["user"]["login"]}}
+""",
+            enable_async=True,
+        )
+
+    async def render(self):
+        return await self.template.render_async(**self.model_dump())
 
 
 class PullRequest(BaseModel):
     action: str
     number: int
     pull_request: dict
-    requested_reviewer: dict
+    requested_reviewer: Optional[dict] = None
     repository: dict
     sender: dict
     commit_id: str
     review: Optional[dict] = None
+    template: str = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
@@ -63,24 +91,22 @@ Review of PR#{{pull_request["id"]}}({{ pull_request["title"] }})
 by {{sender.login}}
 
 requested from:
+
 {% for r in pull_request["requested_reviewers"] %}
 - @{{r["login"]}}
 {% endfor %}
             """
 
         elif kwargs["action"] == "reviewed":
-            if kwargs["review"]["type"] == "pull_request_review_rejected":
-                status = "successfully"
-            else:
-                status = "unsuccessfully"
-
-            template_text = f"""
+            template_text = """
 PR Reviewed!
 
-PR#{{quest["id"]}}({{ pull_request["title"] }})
+PR#{{pull_request["id"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 
-was reviewed {status}
+{{pull_request["url"]}}
+
+was reviewed:
 
 {{review["content"]}}
             """
@@ -88,12 +114,7 @@ was reviewed {status}
         self.template = Template(template_text, enable_async=True)
 
     async def render(self):
-        return await self.template.render_async(self.model_dump())
+        return await self.template.render_async(**self.model_dump())
 
 
-class PROpened(BaseModel):
-    action: str
-    pull_request: dict
-
-
-ForgeJoAlerts = Union[PushNotification, PullRequest]
+ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated]
