@@ -138,7 +138,7 @@ async def post_message(endpoint: str, alert: KnownModels ):
     span.add_event("sending message")
 
     if isinstance(alert, KnownModels):
-        msg = alert.render()
+        msg = await alert.render()
         logger.info(
             "sending alert",
             extra={"alert":msg, "target_group": endpoint},

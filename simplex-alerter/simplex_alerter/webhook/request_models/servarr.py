@@ -18,7 +18,7 @@ class SonarrAlert(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.template = Environment.from_string("""
+        self.template = Environment(enable_async = True).from_string("""
 {eventType}
 
 {series.title}
@@ -33,8 +33,8 @@ class SonarrAlert(BaseModel):
 {%endfor%}
 """)
 
-    def render(self):
-        return self.template.render(self.model_dump())
+    async def render(self):
+        return await self.template.render_async(self.model_dump())
 
 
 ServarrAlert = Union[SonarrAlert]
