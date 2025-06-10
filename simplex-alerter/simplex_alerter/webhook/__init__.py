@@ -131,7 +131,7 @@ async def post_message(endpoint: str,request: Request,  alert: Union[KnownModels
     chatId = groups.get(endpoint)
 
     body = await request.body()
-    logger.info("received message",extra = {"request_body":body})
+    logger.info(f"received message {body}")
 
     if not chatId:
         logger.error(f"chat group {endpoint} not found")
