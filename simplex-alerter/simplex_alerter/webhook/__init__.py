@@ -120,7 +120,7 @@ async def metrics():
 
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
-async def post_message(endpoint: str, alert: Union[KnownModels,dict] ):
+async def post_message(endpoint: str,request: Request,  alert: Union[KnownModels,dict] ):
     span = trace.get_current_span()
     logger = getLogger(service_name)
     global simplex_endpoint
@@ -129,6 +129,9 @@ async def post_message(endpoint: str, alert: Union[KnownModels,dict] ):
     span.add_event("getting latest groups")
     groups = await get_groups(await client.api_get_groups())
     chatId = groups.get(endpoint)
+
+    body = await request.body()
+    logger.info("received message",extra = {"request_body":body})
 
     if not chatId:
         logger.error(f"chat group {endpoint} not found")
