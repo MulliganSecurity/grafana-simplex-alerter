@@ -120,7 +120,7 @@ async def metrics():
 
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
-async def post_message(endpoint: str, alert: Union[KnownModels, dict]):
+async def post_message(endpoint: str, alert: Union[KnownModels]):
     span = trace.get_current_span()
     logger = getLogger(service_name)
     global simplex_endpoint
@@ -137,18 +137,11 @@ async def post_message(endpoint: str, alert: Union[KnownModels, dict]):
 
     span.add_event("sending message")
 
-    if isinstance(alert, KnownModels):
-        logger.info(
-            "sending alert",
-            extra={"alert": alert.message, "target_group": endpoint},
-        )
-        await client.api_send_text_message(ChatType.Group, chatId, alert.render())
-    else:
-        logger.info("unknown alert model, sending raw json", extra={"content": alert})
-        await client.api_send_text_message(
-            ChatType.Group, chatId, json.dumps(alert, indent=4)
-        )
-
+    logger.info(
+        "sending alert",
+        extra={"alert": alert.message, "target_group": endpoint},
+    )
+    await client.api_send_text_message(ChatType.Group, chatId, alert.render())
     return Response()
 
 
