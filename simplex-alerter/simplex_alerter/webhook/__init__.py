@@ -138,11 +138,12 @@ async def post_message(endpoint: str, alert: KnownModels ):
     span.add_event("sending message")
 
     if isinstance(alert, KnownModels):
+        msg = alert.render()
         logger.info(
             "sending alert",
-            extra={"alert": alert.message, "target_group": endpoint},
+            extra={"alert":msg, "target_group": endpoint},
         )
-        await client.api_send_text_message(ChatType.Group, chatId, alert.render())
+        await client.api_send_text_message(ChatType.Group, chatId, msg)
     else:
         logger.info("unknown alert model, sending raw json", extra={"content": alert})
         await client.api_send_text_message(
