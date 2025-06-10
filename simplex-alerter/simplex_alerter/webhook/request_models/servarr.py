@@ -2,6 +2,7 @@ from jinja2 import Template
 from pydantic import BaseModel
 from typing import Union, Optional
 
+
 class SonarrAlert(BaseModel):
     eventType: str
     source: Optional[str] = None
@@ -18,10 +19,10 @@ class SonarrAlert(BaseModel):
     downloadId: Optional[str] = None
     template: str = None
 
-
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.template = Template("""
+        self.template = Template(
+            """
 event: {{eventType}}
 
 {% if series != None %}
@@ -43,7 +44,9 @@ event: {{eventType}}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
     {% endfor %}
 {% endif %}
-""", enable_async = True)
+""",
+            enable_async=True,
+        )
 
     async def render(self):
         return await self.template.render_async(self.model_dump())
