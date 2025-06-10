@@ -131,6 +131,7 @@ async def post_message(endpoint: str,request: Request,  alert: Union[KnownModels
     chatId = groups.get(endpoint)
 
     body = await request.body()
+    body = body.decode()
     logger.info(f"received message {body}")
 
     if not chatId:
