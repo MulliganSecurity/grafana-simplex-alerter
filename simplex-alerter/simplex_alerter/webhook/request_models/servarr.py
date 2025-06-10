@@ -6,13 +6,14 @@ class SonarrAlert(BaseModel):
     series: dict
     episodes: list
     eventType: str
-    instanceName: Optional[str]
-    applicationUrl: Optional[str]
-    customFormatInfo: Optional[dict]
-    downloadClient: Optional[str]
-    downloadClientType: Optional[str]
-    downloadId: Optional[str]
-    release: Optional[dict]
+    instanceName: Optional[str] = None
+    applicationUrl: Optional[str] = None
+    customFormatInfo: Optional[dict] = None
+    downloadClient: Optional[str] = None
+    downloadClientType: Optional[str] = None
+    downloadId: Optional[str] = None
+    release: Optional[dict] = None
+
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
