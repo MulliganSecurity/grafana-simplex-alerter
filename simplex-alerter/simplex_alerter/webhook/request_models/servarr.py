@@ -19,9 +19,9 @@ class SonarrAlert(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template("""
-{eventType}
+{{eventType}}
 
-{series.title}
+{{series.title}}
 
 {% for i in series.images%}
     {% if i["coverType"] == "poster" %}
