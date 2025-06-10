@@ -22,23 +22,27 @@ class SonarrAlert(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template("""
-{{eventType}}
+event: {{eventType}}
 
+{% if series != None %}
 {{series.title}}
 
-{% for i in series.images%}
-    {% if i["coverType"] == "poster" %}
+    {% for i in series.images%}
+        {% if i["coverType"] == "poster" %}
 {{i["remoteUrl"]}}
-    {% endif %}
-{% endfor %}
+        {% endif %}
+    {% endfor %}
+{% endif %}
 
 {% if release != None %}
 {{ release.releaseTitle}} found on {{ release.indexer }}
 {% endif %}
 
-{% for ep in episodes %}
+{% if episodes != None %}
+    {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
-{% endfor %}
+    {% endfor %}
+{% endif %}
 """, enable_async = True)
 
     async def render(self):
