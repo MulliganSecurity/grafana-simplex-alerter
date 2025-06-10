@@ -1,10 +1,11 @@
 from pydantic import BaseModel
+import json
 from typing import Union, Optional
 from jinja2 import Template
 
 
 class PushNotification(BaseModel):
-    refs: str
+    ref: str
     before: str
     after: str
     compare_url: str
@@ -20,7 +21,7 @@ class PushNotification(BaseModel):
         super().__init__(**kwargs)
         self.template = Template(
             """
-New content pushed to {{repository["full_name"}}!
+New content pushed to {{repository["full_name"]}} by {{head_commit["author"]["name"]}}!
 
 {{head_commit["message"]}}""",
             enable_async=True,
@@ -107,11 +108,29 @@ against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 
 {{pull_request["url"]}}
 
-was reviewed:
+was reviewed by {{sender["login"]}}
 
 {{review["content"]}}
+
             """
 
+        elif kwargs["action"] == "closed":
+            template_text = """
+PR closed!
+
+PR#{{pull_request["id"]}}({{ pull_request["title"] }})
+against {{pull_request["base"]["repo"]["full_name"]}}
+
+{{pull_request["url"]}}
+
+{% if pull_request["merged"] %}
+{{ pull_request["merged_by"]["login"] }} merged it into {{pull_request["base"]["repo"]["full_name"]}}
+{% else %}
+{{sender.login}} closed it
+{% endif %}
+            """
+        else:
+            template_text = json.dumps(kwargs)
         self.template = Template(template_text, enable_async=True)
 
     async def render(self):
