@@ -44,13 +44,31 @@ class IssueCreated(BaseModel):
         super().__init__(**kwargs)
         self.template = Template(
             """
-New issue opened!
 
 Issue #{{issue["id"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}
 
 {{issue["url"]}}
 
-was opened by {{issue["user"]["login"]}}
+{% if action == "assigned" %}
+Has been assigned to:
+
+{% for a in issue["assignees"] %}
+- @{{ a["login"] }}
+{% endfor %}
+
+{% elif action == "unassigned" %}
+Has been unassigned
+
+{% elif action == "opened" %}
+
+Has been opened by {{issue["user"]["login"]}}
+
+{% else %}
+
+Unknown action: {{action}}
+
+{% endif %}
+
 """,
             enable_async=True,
         )
