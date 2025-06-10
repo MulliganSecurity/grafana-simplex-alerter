@@ -18,7 +18,7 @@ class SonarrAlert(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.template = """
+        self.template = Environment.from_string("""
 {eventType}
 
 {series.title}
@@ -31,11 +31,10 @@ class SonarrAlert(BaseModel):
 {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
 {%endfor%}
-"""
+""")
 
     def render(self):
-        template = Environment.from_string(self.template)
-        return template.render(self.model_dump())
+        return self.template.render(self.model_dump())
 
 
 ServarrAlert = Union[SonarrAlert]
