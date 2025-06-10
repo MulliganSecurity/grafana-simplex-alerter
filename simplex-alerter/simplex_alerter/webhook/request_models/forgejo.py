@@ -63,6 +63,10 @@ Has been unassigned
 
 Has been opened by {{issue["user"]["login"]}}
 
+{% elif action == "closed" %}
+
+Has been closed by {{sender["login"]}}
+
 {% else %}
 
 Unknown action: {{action}}
