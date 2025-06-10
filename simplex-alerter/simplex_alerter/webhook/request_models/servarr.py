@@ -1,4 +1,4 @@
-from jinja2 import Environment
+from jinja2 import Template
 from pydantic import BaseModel
 from typing import Union, Optional
 
@@ -18,7 +18,7 @@ class SonarrAlert(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.template = Environment(enable_async = True).from_string("""
+        self.template = Template("""
 {eventType}
 
 {series.title}
@@ -31,7 +31,7 @@ class SonarrAlert(BaseModel):
 {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
 {%endfor%}
-""")
+""", enable_async = True)
 
     async def render(self):
         return await self.template.render_async(self.model_dump())
