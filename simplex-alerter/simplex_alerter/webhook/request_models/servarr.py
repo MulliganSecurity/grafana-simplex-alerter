@@ -13,6 +13,7 @@ class SonarrAlert(BaseModel):
     downloadClientType: Optional[str] = None
     downloadId: Optional[str] = None
     release: Optional[dict] = None
+    template: str = None
 
 
     def __init__(self, **kwargs):
