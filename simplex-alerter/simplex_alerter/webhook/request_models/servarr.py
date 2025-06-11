@@ -46,6 +46,8 @@ event: {{eventType}}
 {% endif %}
 """,
             enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
         )
 
     async def render(self):
