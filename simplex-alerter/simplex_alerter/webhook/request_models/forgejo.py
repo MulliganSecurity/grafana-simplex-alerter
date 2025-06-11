@@ -140,4 +140,45 @@ against {{pull_request["base"]["repo"]["full_name"]}}
         return await self.template.render_async(**self.model_dump())
 
 
-ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated]
+class WorkflowNotification(BaseModel):
+    action: str
+    workflow_job: dict
+    organization: dict
+    repository: dict
+    sender: dict
+    template: str = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        if kwargs["action"] == "in_progress":
+            template_text = """New workflow started!
+Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} started on {{repository["full_name"]}}
+Steps:
+{% for s in workflow_job["steps"] %}
+- {{s["name"]}}
+{% endfor %}
+            """
+        elif kwargs["action"] == "completed":
+            template_text = """Workflow completed
+Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} on {{repository["full_name"]}} completed
+Result: {{workflow_job["conclusion"]}}
+Steps:
+{% for s in workflow_job["steps"] %}
+- {{s["name"]}}: {{s["conclusion"]}}
+{% endfor %}"""
+
+        else:
+            template_text = json.dumps(kwargs)
+
+        self.template = Template(
+            template_text,
+            enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+    async def render(self):
+        return await self.template.render_async(**self.model_dump())
+
+
+ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated, WorkflowNotification]
