@@ -20,10 +20,8 @@ class PushNotification(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template(
-            """
-New content pushed to {{repository["full_name"]}} by {{head_commit["author"]["name"]}}!
-
-{{head_commit["message"]}}""",
+            """New content pushed to {{repository["full_name"]}} by {{head_commit["author"]["name"]}}!
+- {{head_commit["message"]}}""",
             enable_async=True,
             trim_blocks=True,
             lstrip_blocks=True,
@@ -45,34 +43,22 @@ class IssueCreated(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template(
-            """
-
-Issue #{{issue["id"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}
-
+            """Issue #{{issue["id"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}!
 {{issue["url"]}}
 
 {% if action == "assigned" %}
 Has been assigned to:
-
 {% for a in issue["assignees"] %}
 - @{{ a["login"] }}
 {% endfor %}
-
 {% elif action == "unassigned" %}
 Has been unassigned
-
 {% elif action == "opened" %}
-
 Has been opened by {{issue["user"]["login"]}}
-
 {% elif action == "closed" %}
-
 Has been closed by {{sender["login"]}}
-
 {% else %}
-
 Unknown action: {{action}}
-
 {% endif %}
 
 """,
@@ -100,55 +86,41 @@ class PullRequest(BaseModel):
         super().__init__(**kwargs)
         template_text = ""
         if kwargs["action"] == "opened":
-            template_text = """
-New PR Created
+            template_text = """New PR Created!
+
 PR#{{pull_request["id"]}}({{ pull_request["title"] }})
-
 {{pull_request["url"]}}
-
 was opened against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 """
         elif kwargs["action"] == "review_requested":
-            template_text = """
-PR Review requested
+            template_text = """PR Review requested
 
 Review of PR#{{pull_request["id"]}}({{ pull_request["title"] }})
-
 {{pull_request["url"]}}
-
 by {{sender.login}}
-
 requested from:
-
 {% for r in pull_request["requested_reviewers"] %}
 - @{{r["login"]}}
 {% endfor %}
             """
 
         elif kwargs["action"] == "reviewed":
-            template_text = """
-PR Reviewed!
+            template_text = """PR Reviewed!
 
 PR#{{pull_request["id"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
-
 {{pull_request["url"]}}
-
 was reviewed by {{sender["login"]}}
-
 {{review["content"]}}
 
             """
 
         elif kwargs["action"] == "closed":
-            template_text = """
-PR closed!
+            template_text = """PR closed!
 
 PR#{{pull_request["id"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}}
-
 {{pull_request["url"]}}
-
 {% if pull_request["merged"] %}
 {{ pull_request["merged_by"]["login"] }} merged it into {{pull_request["base"]["repo"]["full_name"]}}
 {% else %}
