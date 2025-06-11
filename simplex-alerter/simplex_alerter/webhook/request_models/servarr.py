@@ -24,21 +24,17 @@ class SonarrAlert(BaseModel):
         self.template = Template(
             """
 event: {{eventType}}
-
 {% if series != None %}
 {{series.title}}
-
     {% for i in series.images%}
         {% if i["coverType"] == "poster" %}
 {{i["remoteUrl"]}}
         {% endif %}
     {% endfor %}
 {% endif %}
-
 {% if release != None %}
 {{ release.releaseTitle}} found on {{ release.indexer }}
 {% endif %}
-
 {% if episodes != None %}
     {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
