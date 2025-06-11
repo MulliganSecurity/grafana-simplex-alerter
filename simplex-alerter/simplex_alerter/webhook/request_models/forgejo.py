@@ -167,6 +167,12 @@ Steps:
 - {{s["name"]}}: {{s["conclusion"]}}
 {% endfor %}"""
 
+        elif kwargs["action"] == "queued":
+            template_text = """New workflow queued!
+Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} queued for {{repository["full_name"]}}
+            """
+
+
         else:
             template_text = json.dumps(kwargs)
 
