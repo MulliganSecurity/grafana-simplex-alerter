@@ -152,7 +152,7 @@ class WorkflowNotification(BaseModel):
         super().__init__(**kwargs)
         if kwargs["action"] == "in_progress":
             template_text = """New workflow started!
-Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} started on {{repository["full_name"]}}
+Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} started on {{repository["full_name"]}}
 Steps:
 {% for s in workflow_job["steps"] %}
 - {{s["name"]}}
@@ -160,7 +160,7 @@ Steps:
             """
         elif kwargs["action"] == "completed":
             template_text = """Workflow completed
-Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} on {{repository["full_name"]}} completed
+Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} on {{repository["full_name"]}} completed
 Result: {{workflow_job["conclusion"]}}
 Steps:
 {% for s in workflow_job["steps"] %}
@@ -169,7 +169,7 @@ Steps:
 
         elif kwargs["action"] == "queued":
             template_text = """New workflow queued!
-Workflow #{{workflow_job["id"]}}-{{wokflow_job["run_id"]}} queued for {{repository["full_name"]}}
+Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} queued for {{repository["full_name"]}}
             """
 
 
