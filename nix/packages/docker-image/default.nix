@@ -39,6 +39,7 @@ let
   };
   start_services = pkgs.writeScriptBin "start-script.sh" ''
     /bin/simplex-chat -y -p 7897 -d /simplex/chatDB &
+    sleep 15
     /bin/simplex-alerter -b 0.0.0.0:7898 -c /alerterconfig/config.yml -e 127.0.0.1:7897 '';
 
 in
