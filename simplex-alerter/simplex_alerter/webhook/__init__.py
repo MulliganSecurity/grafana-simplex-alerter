@@ -120,7 +120,9 @@ async def metrics():
 
 @app.post("/{endpoint:path}")
 @traced(**traced_conf)
-async def post_message(endpoint: str, request: Request, alert: Union[KnownModels, dict]):
+async def post_message(
+    endpoint: str, request: Request, alert: Union[KnownModels, dict]
+):
     span = trace.get_current_span()
     logger = getLogger(service_name)
     global simplex_endpoint
