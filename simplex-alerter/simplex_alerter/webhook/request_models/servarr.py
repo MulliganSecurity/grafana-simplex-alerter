@@ -8,6 +8,7 @@ class SonarrAlert(BaseModel):
     source: Optional[str] = None
     host: Optional[str] = None
     series: Optional[dict]
+    movie: Optional[dict]
     episodes: Optional[list]
     release: Optional[dict] = None
     instanceName: Optional[str] = None
@@ -34,6 +35,10 @@ event: {{eventType}}
     {% for ep in episodes %}
 - S{{ep["seasonNumber"]}}E{{ep["episodeNumber"]}}
     {% endfor %}
+{% endif %}
+{% if movie != None %}
+{{movie["title"]}}
+{{movie["overview"]}}
 {% endif %}
 """,
             enable_async=True,
