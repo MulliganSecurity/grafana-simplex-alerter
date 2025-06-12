@@ -99,6 +99,7 @@ Review of PR#{{pull_request["id"]}}({{ pull_request["title"] }})
 {{pull_request["url"]}}
 by {{sender.login}}
 requested from:
+- @{{requested_reviewer["login"]}}
 {% for r in pull_request["requested_reviewers"] %}
 - @{{r["login"]}}
 {% endfor %}
