@@ -9,6 +9,7 @@ class SonarrAlert(BaseModel):
     host: Optional[str] = None
     series: Optional[dict]
     movie: Optional[dict]
+    remoteMovie: Optional[dict]
     episodes: Optional[list]
     release: Optional[dict] = None
     instanceName: Optional[str] = None
