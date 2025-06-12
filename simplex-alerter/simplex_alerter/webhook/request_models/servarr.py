@@ -26,11 +26,6 @@ class SonarrAlert(BaseModel):
 event: {{eventType}}
 {% if series != None %}
 {{series.title}}
-    {% for i in series.images%}
-        {% if i["coverType"] == "poster" %}
-{{i["remoteUrl"]}}
-        {% endif %}
-    {% endfor %}
 {% endif %}
 {% if release != None %}
 {{ release.releaseTitle}} found on {{ release.indexer }}
