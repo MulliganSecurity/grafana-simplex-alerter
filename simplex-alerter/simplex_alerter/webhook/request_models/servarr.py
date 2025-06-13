@@ -7,10 +7,10 @@ class SonarrAlert(BaseModel):
     eventType: str
     source: Optional[str] = None
     host: Optional[str] = None
-    series: Optional[dict]
-    movie: Optional[dict]
-    remoteMovie: Optional[dict]
-    episodes: Optional[list]
+    series: Optional[dict] = None
+    movie: Optional[dict] = None
+    remoteMovie: Optional[dict] = None
+    episodes: Optional[list] = None
     release: Optional[dict] = None
     instanceName: Optional[str] = None
     trigger: Optional[str] = None
