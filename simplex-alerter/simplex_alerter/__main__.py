@@ -2,7 +2,7 @@ from .webhook import get_app, set_endpoint
 import uvicorn
 import argparse
 from observlib import configure_telemetry
-from .config import generate_config, load_config
+from .config import load_config
 
 
 def run():
@@ -48,14 +48,6 @@ def run():
     )
 
     parser.add_argument(
-        "-g",
-        "--generate-config",
-        action="store_true",
-        help="generate config file with placeholder values",
-        dest="gen_config",
-    )
-
-    parser.add_argument(
         "-e",
         "--endpoint",
         action="store",
@@ -66,9 +58,6 @@ def run():
 
     args = parser.parse_args()
 
-    if args.gen_config:
-        generate_config()
-        return
     if not args.config:
         print("config file required")
         return

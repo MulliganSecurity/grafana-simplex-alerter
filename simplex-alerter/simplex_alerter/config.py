@@ -12,10 +12,6 @@ DEFAULT_CONFIG = {
 }
 
 
-def generate_config():
-    print(yaml.dump(DEFAULT_CONFIG))
-
-
 def load_config(filename):
     global CONFIG
     with open(filename) as fh:
