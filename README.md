@@ -18,8 +18,8 @@ nix build .#docker-image
 
 ~~~
 docker build . -t builder
-docker run --rm $(pwd):/src builder
-docker load < result
+docker run --rm -v $(pwd):/src builder
+docker load < simplex-alerter.tar.gz
 ~~~
 
 # How to run
