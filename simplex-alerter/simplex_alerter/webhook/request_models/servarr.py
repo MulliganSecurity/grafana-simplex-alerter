@@ -1,6 +1,7 @@
 from jinja2 import Template
 from pydantic import BaseModel
 from typing import Union, Optional
+import json
 
 
 class SonarrAlert(BaseModel):
@@ -30,7 +31,7 @@ event: {{eventType}}
 {{series.title}}
 {% endif %}
 {% if release != None %}
-{{ release.releaseTitle}} found on {{ release.indexer }}
+{{ release.releaseTitle}} {% if release.indexer %}found on {{ release.indexer }} {% endif %}
 {% endif %}
 {% if episodes != None %}
     {% for ep in episodes %}
@@ -41,6 +42,8 @@ event: {{eventType}}
 {{movie["title"]}}
 {{movie["overview"]}}
 {% endif %}
+
+raw_json: {{raw_json}}
 """,
             enable_async=True,
             trim_blocks=True,
@@ -48,7 +51,7 @@ event: {{eventType}}
         )
 
     async def render(self):
-        return await self.template.render_async(self.model_dump())
+        return await self.template.render_async(self.model_dump(), raw_json = json.dumps(self.model_dump()))
 
 
 ServarrAlert = Union[SonarrAlert]
