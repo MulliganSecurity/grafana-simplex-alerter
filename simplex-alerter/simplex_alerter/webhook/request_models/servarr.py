@@ -21,9 +21,11 @@ class SonarrAlert(BaseModel):
     downloadClientType: Optional[str] = None
     downloadId: Optional[str] = None
     template: str = None
+    raw_values: str = None
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
+        self.raw_values = json.dumps(kwargs, indent = 4)
         self.template = Template(
             """
 event: {{eventType}}
@@ -43,7 +45,7 @@ event: {{eventType}}
 {{movie["overview"]}}
 {% endif %}
 
-raw_json: {{raw_json}}
+raw_json: {{raw_values}}
 """,
             enable_async=True,
             trim_blocks=True,
@@ -51,7 +53,7 @@ raw_json: {{raw_json}}
         )
 
     async def render(self):
-        return await self.template.render_async(self.model_dump(), raw_json = json.dumps(self.model_dump()))
+        return await self.template.render_async(self.model_dump())
 
 
 ServarrAlert = Union[SonarrAlert]
