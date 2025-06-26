@@ -48,6 +48,8 @@ traced_conf = {
     "func_name_as_label": True,
 }
 
+endpoint_group_map = {}
+
 
 def get_app():
     global app
@@ -92,14 +94,19 @@ async def startup_event():
 
     groups = await get_groups(await client.api_get_groups())
     for group in config["alert_groups"]:
-        if group["name"] in groups.keys():
+        if group["endpoint_name"] in groups.keys():
             continue
+        custom_group_name = group.get("group_name")
+        if custom_group_name:
+            endpoint_group_map[group["endpoint_name"]] = custom_group_name
+        else:
+            custom_group_name = group["endpoint_name"]
 
         if "invite_link" in group:
-            logger.info("joining group", extra={"group": group["name"]})
+            logger.info("joining group", extra={"group": custom_group_name})
             span.add_event(
                 "joining group",
-                attributes={"message": "joining group", "group": group["name"]},
+                attributes={"message": "joining group", "group": custom_group_name},
             )
             await client.api_connect(group["invite_link"])
 
@@ -130,7 +137,13 @@ async def post_message(
     client = await ChatClient.create(simplex_endpoint)
     span.add_event("getting latest groups")
     groups = await get_groups(await client.api_get_groups())
-    chatId = groups.get(endpoint)
+
+    custom_group_name = endpoint_group_map.get(endpoint)
+    if custom_group_name:
+        chatId = groups.get(custom_group_name)
+    else:
+        chatId = groups.get(endpoint)
+
 
     body = await request.body()
     body = body.decode()

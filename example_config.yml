@@ -1,3 +1,4 @@
 alert_groups:
-- invite_link: "https://simplex.chat/contact#/?v=2-7&smp=smp%3A%2F%2FiZJO"
-  name: alerting_endpoint
+- invite_link: https://simplex.chat/contact#/?v=2-7&smp=smp%3A%2F%2F6iIcWT_dF2zN_w5xzZEY7HI2Prbh3ldP07YTyDexPjE%3D%40smp10.simplex.im%2FYeJNdcuWnPelIgJBVme2YOQHFrJqrqM9%23%2F%3Fv%3D1-4%26dh%3DMCowBQYDK2VuAyEA_yynlZ8ao6cG9U_A8gLv59_MHocY1xCaiuhFoE5I2Xk%253D%26q%3Dc%26srv%3Drb2pbttocvnbrngnwziclp2f4ckjq65kebafws6g4hy22cdaiv5dwjqd.onion&data=%7B%22groupLinkId%22%3A%22kHR06d2Am4juWMx-CORTtg%3D%3D%22%7D
+  endpoint_name: clandestineInfraAlerts
+  group_name: "This is not a test!" #set this if the group name configured in simpleX is different from the endpoint name used for alerts
