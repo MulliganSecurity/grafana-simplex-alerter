@@ -43,7 +43,7 @@ class IssueCreated(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template(
-            """Issue #{{issue["id"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}!
+            """Issue #{{issue["number"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}!
 {{issue["url"]}}
 
 {% if action == "assigned" %}
@@ -88,14 +88,14 @@ class PullRequest(BaseModel):
         if kwargs["action"] == "opened":
             template_text = """New PR Created!
 
-PR#{{pull_request["id"]}}({{ pull_request["title"] }})
+PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 {{pull_request["url"]}}
 was opened against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 """
         elif kwargs["action"] == "review_requested":
             template_text = """PR Review requested
 
-Review of PR#{{pull_request["id"]}}({{ pull_request["title"] }})
+Review of PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 {{pull_request["url"]}}
 by {{sender.login}}
 requested from:
@@ -108,7 +108,7 @@ requested from:
         elif kwargs["action"] == "reviewed":
             template_text = """PR Reviewed!
 
-PR#{{pull_request["id"]}}({{ pull_request["title"] }})
+PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 {{pull_request["url"]}}
 was reviewed by {{sender["login"]}}
@@ -119,7 +119,7 @@ was reviewed by {{sender["login"]}}
         elif kwargs["action"] == "closed":
             template_text = """PR closed!
 
-PR#{{pull_request["id"]}}({{ pull_request["title"] }})
+PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}}
 {{pull_request["url"]}}
 {% if pull_request["merged"] %}
