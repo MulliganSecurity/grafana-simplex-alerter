@@ -217,4 +217,4 @@ Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} queued for {{reposit
         return await self.template.render_async(**self.model_dump())
 
 
-ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated, WorkflowNotification]
+ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated, WorkflowNotification, CommentAdded]
