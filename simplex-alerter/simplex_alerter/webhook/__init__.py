@@ -144,7 +144,6 @@ async def post_message(
     else:
         chatId = groups.get(endpoint)
 
-
     body = await request.body()
     body = body.decode()
     logger.info(f"received message {body}")

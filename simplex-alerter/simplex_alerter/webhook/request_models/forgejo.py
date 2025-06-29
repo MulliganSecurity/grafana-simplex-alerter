@@ -30,6 +30,7 @@ class PushNotification(BaseModel):
     async def render(self):
         return await self.template.render_async(**self.model_dump())
 
+
 class CommentAdded(BaseModel):
     action: str
     issue: Optional[dict] = None
@@ -37,7 +38,7 @@ class CommentAdded(BaseModel):
     comment: dict
     repository: dict
     sender: dict
-    is_pull: bool,
+    is_pull: bool
     template: str = None
 
     def __init__(self, **kwargs):
@@ -46,7 +47,7 @@ class CommentAdded(BaseModel):
             """
 New comment on {% if issue %}issue#{{issue["number"]}}{% else if pull_request %}PR#{{pull_request["number"]}}{% endif %} by {{comment["user"]["login"]}}:
 {{comment["body"]}}
-{{comment["html_url"]}}""",{
+{{comment["html_url"]}}""",
             enable_async=True,
             trim_blocks=True,
             lstrip_blocks=True,
@@ -54,7 +55,6 @@ New comment on {% if issue %}issue#{{issue["number"]}}{% else if pull_request %}
 
     async def render(self):
         return await self.template.render_async(**self.model_dump())
-
 
 
 class IssueCreated(BaseModel):
@@ -202,7 +202,6 @@ Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} queued for {{reposit
 {{workflow_job["html_url"]}}
             """
 
-
         else:
             template_text = json.dumps(kwargs)
 
@@ -217,4 +216,6 @@ Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} queued for {{reposit
         return await self.template.render_async(**self.model_dump())
 
 
-ForgeJoAlerts = Union[PushNotification, PullRequest, IssueCreated, WorkflowNotification, CommentAdded]
+ForgeJoAlerts = Union[
+    PushNotification, PullRequest, IssueCreated, WorkflowNotification, CommentAdded
+]

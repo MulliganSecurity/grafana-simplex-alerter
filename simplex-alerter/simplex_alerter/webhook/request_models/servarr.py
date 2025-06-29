@@ -25,7 +25,7 @@ class SonarrAlert(BaseModel):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.raw_values = json.dumps(kwargs, indent = 4)
+        self.raw_values = json.dumps(kwargs, indent=4)
         self.template = Template(
             """
 event: {{eventType}}
