@@ -46,8 +46,9 @@ class CommentAdded(BaseModel):
         self.template = Template(
             """
 New comment on {% if is_pull %}PR#{{pull_request["number"]}}{% else %}issue#{{issue["number"]}}{% endif %} by {{comment["user"]["login"]}}:
+{{comment["html_url"]}}
 {{comment["body"]}}
-{{comment["html_url"]}}""",
+""",
             enable_async=True,
             trim_blocks=True,
             lstrip_blocks=True,
