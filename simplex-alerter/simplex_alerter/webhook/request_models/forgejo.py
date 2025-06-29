@@ -45,7 +45,7 @@ class CommentAdded(BaseModel):
         super().__init__(**kwargs)
         self.template = Template(
             """
-New comment on {% if issue %}issue#{{issue["number"]}}{% elif pull_request %}PR#{{pull_request["number"]}}{% endif %} by {{comment["user"]["login"]}}:
+New comment on {% if is_pull %}PR#{{pull_request["number"]}}{% elif pull_request %}issue#{{issue["number"]}}{% endif %} by {{comment["user"]["login"]}}:
 {{comment["body"]}}
 {{comment["html_url"]}}""",
             enable_async=True,
