@@ -70,7 +70,7 @@ class IssueCreated(BaseModel):
         super().__init__(**kwargs)
         self.template = Template(
             """Issue #{{issue["number"]}} ({{issue["title"]}}) opened on {{issue["repository"]["full_name"]}}!
-{{issue["url"]}}
+{{issue["html_url"]}}
 
 {% if action == "assigned" %}
 Has been assigned to:
@@ -115,14 +115,14 @@ class PullRequest(BaseModel):
             template_text = """New PR Created!
 
 PR#{{pull_request["number"]}}({{ pull_request["title"] }})
-{{pull_request["url"]}}
+{{pull_request["html_url"]}}
 was opened against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 """
         elif kwargs["action"] == "review_requested":
             template_text = """PR Review requested
 
 Review of PR#{{pull_request["number"]}}({{ pull_request["title"] }})
-{{pull_request["url"]}}
+{{pull_request["html_url"]}}
 by {{sender.login}}
 requested from:
 - @{{requested_reviewer["login"]}}
@@ -136,7 +136,7 @@ requested from:
 
 PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
-{{pull_request["url"]}}
+{{pull_request["html_url"]}}
 was reviewed by {{sender["login"]}}
 {{review["content"]}}
 
@@ -147,7 +147,7 @@ was reviewed by {{sender["login"]}}
 
 PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}}
-{{pull_request["url"]}}
+{{pull_request["html_url"]}}
 {% if pull_request["merged"] %}
 {{ pull_request["merged_by"]["login"] }} merged it into {{pull_request["base"]["repo"]["full_name"]}}
 {% else %}
