@@ -30,6 +30,32 @@ class PushNotification(BaseModel):
     async def render(self):
         return await self.template.render_async(**self.model_dump())
 
+class CommentAdded(BaseModel):
+    action: str
+    issue: Optional[dict] = None
+    pull_request: Optional[dict] = None
+    comment: dict
+    repository: dict
+    sender: dict
+    is_pull: bool,
+    template: str = None
+
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.template = Template(
+            """
+New comment on {% if issue %}issue#{{issue["number"]}}{% else if pull_request %}PR#{{pull_request["number"]}}{% endif %} by {{comment["user"]["login"]}}:
+{{comment["body"]}}
+{{comment["html_url"]}}""",{
+            enable_async=True,
+            trim_blocks=True,
+            lstrip_blocks=True,
+        )
+
+    async def render(self):
+        return await self.template.render_async(**self.model_dump())
+
+
 
 class IssueCreated(BaseModel):
     action: str
