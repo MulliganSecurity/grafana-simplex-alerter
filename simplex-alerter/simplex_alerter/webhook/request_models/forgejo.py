@@ -59,8 +59,9 @@ New comment on {% if issue %}issue#{{issue["number"]}}{% else if pull_request %}
 
 class IssueCreated(BaseModel):
     action: str
-    number: int
     issue: dict
+    comment: Optional[dict] = None
+    number: Optional[int] = None
     repository: dict
     sender: dict
     commit_id: str
@@ -79,7 +80,7 @@ Has been assigned to:
 {% endfor %}
 {% elif action == "unassigned" %}
 Has been unassigned
-{% elif action == "opened" %}
+{% elif action == "opened" or action ==  "created" %}
 Has been opened by {{issue["user"]["login"]}}
 {% elif action == "closed" %}
 Has been closed by {{sender["login"]}}
