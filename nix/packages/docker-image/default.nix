@@ -20,11 +20,11 @@ let
     package_name = namespace;
   };
   env = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
-  simplex-chat = pkgs.stdenv.mkDerivation {
+  simplex-chat = pkgs.stdenv.mkDerivation rec {
     name = "simplex-chat";
     version = "v6.3.4";
     src = pkgs.fetchurl {
-      url = "https://github.com/simplex-chat/simplex-chat/releases/download/v6.3.4/simplex-chat-ubuntu-24_04-x86-64";
+      url = "https://github.com/simplex-chat/simplex-chat/releases/download/${version}/simplex-chat-ubuntu-24_04-x86-64";
       hash = "sha256-8A2jqRaRYy7okGDD8Q8Gx7ZttxXhcSDsFRKvvdbyZHc=";
     };
     dontBuild = true;
