@@ -90,8 +90,10 @@ async def startup_event():
     span.add_event("initializing client", attributes={"endpoint": simplex_endpoint})
     logger.info("initializing client", extra={"endpoint": simplex_endpoint})
     client = await ChatClient.create(simplex_endpoint)
+    logger.info("retrieving config")
     config = get_config()
 
+    logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
     logger.info("groups from client",extra = {"groups": groups})
     logger.info("groups from config", extra = {"goups":config["alert_groups"]})
