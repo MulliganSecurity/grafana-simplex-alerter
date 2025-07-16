@@ -93,6 +93,8 @@ async def startup_event():
     config = get_config()
 
     groups = await get_groups(await client.api_get_groups())
+    logger.info("groups from client",extra = {"groups": groups})
+    logger.info("groups from config", extra = {"goups":config["alert_groups"]})
     for group in config["alert_groups"]:
         if group["endpoint_name"] in groups.keys():
             continue
