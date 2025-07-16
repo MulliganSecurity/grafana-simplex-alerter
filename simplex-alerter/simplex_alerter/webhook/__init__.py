@@ -75,7 +75,7 @@ async def get_groups(group_data):
 @app.on_event("startup")
 @traced(
     tracer=traced_conf["tracer"],
-    timing_histogram={
+    timer={
         "name": "execution_timer",
         "unit": "ms",
         "description": "function execution duration",
