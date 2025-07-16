@@ -8,8 +8,8 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
 from opentelemetry import trace
-from simpx.client import ChatClient
-from simpx.command import ChatType
+from simplex_alerter.simpx.client import ChatClient
+from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
 

@@ -39,19 +39,6 @@ rec {
         ++ [ prev.pkgs.python313Packages.setuptools ]
         ++ (final.resolveBuildSystem { setuptools = [ ]; });
     });
-
-    simpx-py = prev.simpx-py.overrideAttrs (old: {
-      nativeBuildInputs =
-        old.nativeBuildInputs
-        ++ [ prev.pkgs.python313Packages.setuptools ]
-        ++ (final.resolveBuildSystem { setuptools = [ ]; });
-      patches = [
-        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0001-fix-response-parsing.patch")
-        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0002-add-apiget-groups-command.patch")
-        (lib.snowfall.fs.get-file "nix/packages/${package_name}/0003-patch-getchats-command.patch")
-      ];
-    });
-
   };
 
   # Use Python 3.12 from nixpkgs
