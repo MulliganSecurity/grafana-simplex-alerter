@@ -7,7 +7,6 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.115.12",
     "observlib",
-    "simpx-py",
     "opentelemetry-api>=1.33.1",
     "opentelemetry-instrumentation-asyncio>=0.53b1",
     "opentelemetry-instrumentation-fastapi>=0.54b1",
@@ -25,4 +24,3 @@ simplex-alerter = "simplex_alerter:__main__.run"
 
 [tool.uv.sources]
 observlib = { git = "https://github.com/ForgottenBeast/observlib.git", subdirectory = "observlib" }
-simpx-py = { git = "https://github.com/FailSpy/simpx-py" }
