@@ -1,4 +1,5 @@
 import json
+import asyncio
 from typing import Union
 from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -9,6 +10,7 @@ from functools import lru_cache
 from opentelemetry.metrics import get_meter
 from opentelemetry import trace
 from simplex_alerter.simpx.client import ChatClient
+from simplex_alerter.config import CONNECTION_ATTEMPTS
 from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
@@ -112,7 +114,17 @@ async def startup_event():
                 "joining group",
                 attributes={"message": "joining group", "group": custom_group_name},
             )
-            await client.api_connect(group["invite_link"])
+            attempts = 0
+            while attempts < CONNECTION_ATTEMPTS:
+                try:
+                    logger.info(f"attempting join on {custom_group_name}")
+                    await client.api_connect(group["invite_link"])
+                    logger.info(f"joined group {custom_group_name}")
+                    break
+                except:
+                    logger.info("waiting for 5 seconds before retrying join")
+                    asyncio.sleep(5)
+                    attempts += 1
 
 
 @app.on_event("shutdown")
