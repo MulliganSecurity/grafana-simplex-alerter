@@ -3,6 +3,7 @@ import uvicorn
 import argparse
 from observlib import configure_telemetry
 from .config import load_config
+from .chat import init_chat
 
 
 def run():
@@ -56,6 +57,15 @@ def run():
         dest="endpoint",
     )
 
+    parser.add_argument(
+        "-p",
+        "--profile-name",
+        action="store",
+        help="simplex bot name",
+        default="alertBot",
+        dest="profile",
+    )
+
     args = parser.parse_args()
 
     if not args.config:
@@ -71,6 +81,8 @@ def run():
         args.pyroscope_server,
         args.debug,
     )
+
+    init_chat(args.profile)
 
     [host, port] = args.bind_addr.split(":")
 
