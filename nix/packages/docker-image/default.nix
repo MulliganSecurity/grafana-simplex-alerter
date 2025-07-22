@@ -20,23 +20,35 @@ let
     package_name = namespace;
   };
   env = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
-  nixos = pkgs.dockerTools.pullImage {
-    imageName = "nixos/nix";
-    imageDigest = "sha256:8c144c6c37184fe03fd7fed740c6eeb2ecfd801d6e34a6aba4e38f1c8d10de3e";
-    finalImageName = "nixos/nix";
-    sha256 = "sha256-WeFkiLfv+UX+ZNJYjO2TGHb357xJFP7zBcmVn/jVNXQ=";
+  simplex-chat = pkgs.stdenv.mkDerivation {
+    name = "simplex-chat";
+    version = "v6.3.4";
+    src = pkgs.fetchurl {
+      url = "https://github.com/simplex-chat/simplex-chat/releases/download/v6.3.4/simplex-chat-ubuntu-24_04-x86-64";
+      hash = "sha256-8A2jqRaRYy7okGDD8Q8Gx7ZttxXhcSDsFRKvvdbyZHc=";
+    };
+    dontBuild = true;
+    dontUnpack = true;
+    installPhase = "mkdir -p $out/bin; cp $src $out/bin/simplex-chat; chmod +x $out/bin/simplex-chat";
   };
-
+  ubuntu = pkgs.dockerTools.pullImage {
+    imageName = "ubuntu";
+    imageDigest = "sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f";
+    finalImageName = "ubuntu";
+    sha256 = "sha256-YdbJusA6R6SRxpoMZzQI/F0XoIw2cQKlz4FMvbAHGoA=";
+  };
+  alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
 
 in
 pkgs.dockerTools.buildImage {
   name = "simplex-alerter";
   tag = "latest";
-  fromImage = nixos;
+  fromImage = ubuntu;
   copyToRoot = pkgs.buildEnv {
     name = "image-root";
     paths = [
-      pkgs.${namespace}.simplex-alerter
+      alerter
+      simplex-chat
     ];
     pathsToLink = [ "/bin" ];
   };
