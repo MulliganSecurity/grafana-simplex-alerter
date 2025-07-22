@@ -55,13 +55,13 @@ pkgs.dockerTools.buildImage {
   config = {
     ExposedPorts."7898" = { };
     EntryPoint = [
-        "/bin/simplex-alerter"
-        "-b"
-        "0.0.0.0:7898"
-        "-c"
-        "/alerterconfig/config.yml"
-        "-e"
-        "127.0.0.1:7897"
+      "/bin/simplex-alerter"
+      "-b"
+      "0.0.0.0:7898"
+      "-c"
+      "/alerterconfig/config.yml"
+      "-e"
+      "127.0.0.1:7897"
     ];
   };
 }
