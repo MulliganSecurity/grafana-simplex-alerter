@@ -1,4 +1,6 @@
 import json
+from builtins import ConnectionRefusedError
+import subprocess
 import asyncio
 from typing import Union
 from simplex_alerter.config import get_config
@@ -86,12 +88,28 @@ async def get_groups(group_data):
 )
 async def startup_event():
     global simplex_endpoint
-    span = trace.get_current_span()
+    host_port = simplex_endpoint.split(':')
     logger = getLogger(service_name)
+    logger.info("starting chat client on {}".format(host_port[2]))
+    subprocess.Popen(
+        ["simplex-chat", "-y", "-p", host_port[2], "-d", "chatDB"],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+    span = trace.get_current_span()
 
     span.add_event("initializing client", attributes={"endpoint": simplex_endpoint})
     logger.info("initializing client", extra={"endpoint": simplex_endpoint})
-    client = await ChatClient.create(simplex_endpoint)
+    while True:
+        try:
+            client = await ChatClient.create(simplex_endpoint)
+            break
+        except ConnectionRefusedError:
+            logger.info("waiting for the chat client to connect")
+            await asyncio.sleep(1)
+
     logger.info("retrieving config")
     config = get_config()
 
