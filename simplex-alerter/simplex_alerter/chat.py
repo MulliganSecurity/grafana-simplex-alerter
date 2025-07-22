@@ -3,8 +3,8 @@ from logging import getLogger
 
 logger = getLogger(__name__)
 
-def init_chat(profile_name):
-    chat = pexpect.spawn("simplex-chat -y -p 7897 -d chatDB")
+def init_chat(profile_name,db_path):
+    chat = pexpect.spawn(f"simplex-chat -y -p 7897 -d {db_path}")
     idx = chat.expect(["display name:", "Current user: .*"])
     if idx == 0:
         logger.info("configuring profile name", extra = {"profile_name":profile_name})

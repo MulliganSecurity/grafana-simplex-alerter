@@ -24,6 +24,7 @@ app = FastAPI()
 
 
 simplex_endpoint = None
+db_path = None
 
 
 @lru_cache(maxsize=None)
@@ -64,6 +65,9 @@ def set_endpoint(endpoint):
     global simplex_endpoint
     simplex_endpoint = endpoint
 
+def set_db_path(folder):
+    global db_path
+    db_path = folder
 
 async def get_groups(group_data):
     groups = {}
@@ -87,12 +91,11 @@ async def get_groups(group_data):
     timer_factory=get_timer,
 )
 async def startup_event():
-    global simplex_endpoint
     host_port = simplex_endpoint.split(':')
     logger = getLogger(service_name)
     logger.info("starting chat client on {}".format(host_port[2]))
     subprocess.Popen(
-        ["simplex-chat", "-y", "-p", host_port[2], "-d", "chatDB"],
+        ["simplex-chat", "-y", "-p", host_port[2], "-d", db_path],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
