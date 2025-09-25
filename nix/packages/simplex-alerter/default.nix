@@ -22,10 +22,10 @@ let
     let
       appimage = pkgs.stdenv.mkDerivation rec {
         name = "simplex-chat";
-        version = "v6.3.6";
+        version = "v6.4.5";
         src = pkgs.fetchurl {
-          url = "https://github.com/simplex-chat/simplex-chat/releases/download/${version}/simplex-chat-ubuntu-24_04-x86-64";
-          hash = "sha256-0fE3Aco5bRvcjdaTWFWL/6/Jn+chiCdKnCoYCbINEMo=";
+          url = "https://github.com/simplex-chat/simplex-chat/releases/download/${version}/simplex-chat-ubuntu-24_04-x86_64";
+          hash = "sha256-44felOGQ34OFngsbkXvHcksyoRNizhQKnqMHionEQwQ=";
         };
         dontBuild = true;
         dontUnpack = true;
