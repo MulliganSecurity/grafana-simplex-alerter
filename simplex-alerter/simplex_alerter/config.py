@@ -1,6 +1,7 @@
 import yaml
 
 CONFIG = {}
+CONNECTION_ATTEMPTS = 5
 
 DEFAULT_CONFIG = {
     "alert_groups": [

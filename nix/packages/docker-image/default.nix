@@ -37,10 +37,7 @@ let
     finalImageName = "ubuntu";
     sha256 = "sha256-YdbJusA6R6SRxpoMZzQI/F0XoIw2cQKlz4FMvbAHGoA=";
   };
-  start_services = pkgs.writeScriptBin "start-script.sh" ''
-    /bin/simplex-chat -y -p 7897 -d /alerterconfig/chatDB &
-    sleep 15
-    /bin/simplex-alerter -b 0.0.0.0:7898 -c /alerterconfig/config.yml -e 127.0.0.1:7897 '';
+  alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
 
 in
 pkgs.dockerTools.buildImage {
@@ -50,17 +47,21 @@ pkgs.dockerTools.buildImage {
   copyToRoot = pkgs.buildEnv {
     name = "image-root";
     paths = [
-      pkgs.${namespace}.simplex-alerter
+      alerter
       simplex-chat
-      start_services
     ];
     pathsToLink = [ "/bin" ];
   };
   config = {
     ExposedPorts."7898" = { };
     EntryPoint = [
-      "bash"
-      "start-script.sh"
+      "/bin/simplex-alerter"
+      "-b"
+      "0.0.0.0:7898"
+      "-c"
+      "/alerterconfig/config.yml"
+      "-e"
+      "127.0.0.1:7897"
     ];
   };
 }

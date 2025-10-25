@@ -44,10 +44,6 @@ event: {{eventType}}
 {{movie["title"]}}
 {{movie["overview"]}}
 {% endif %}
-
-{% if eventType == "ManualInteractionRequired" %}
-raw_json: {{raw_values}}
-{% endif %}
 """,
             enable_async=True,
             trim_blocks=True,

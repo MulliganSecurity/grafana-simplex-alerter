@@ -44,8 +44,7 @@ class CommentAdded(BaseModel):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.template = Template(
-            """
-New comment on {% if is_pull %}PR#{{pull_request["number"]}}{% else %}issue#{{issue["number"]}}{% endif %} by {{comment["user"]["login"]}}:
+            """New comment on {% if is_pull %}PR#{{pull_request["number"]}}{% else %}issue#{{issue["number"]}}{% endif %} by {{comment["user"]["login"]}}:
 {{comment["html_url"]}}
 {{comment["body"]}}
 """,
@@ -87,9 +86,7 @@ Has been opened by {{issue["user"]["login"]}}
 Has been closed by {{sender["login"]}}
 {% else %}
 Unknown action: {{action}}
-{% endif %}
-
-""",
+{% endif %}""",
             enable_async=True,
             trim_blocks=True,
             lstrip_blocks=True,
@@ -118,8 +115,7 @@ class PullRequest(BaseModel):
 
 PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 {{pull_request["html_url"]}}
-was opened against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
-"""
+was opened against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}"""
         elif kwargs["action"] == "review_requested":
             template_text = """PR Review requested
 
@@ -130,8 +126,7 @@ requested from:
 - @{{requested_reviewer["login"]}}
 {% for r in pull_request["requested_reviewers"] %}
 - @{{r["login"]}}
-{% endfor %}
-            """
+{% endfor %}"""
 
         elif kwargs["action"] == "reviewed":
             template_text = """PR Reviewed!
@@ -140,9 +135,7 @@ PR#{{pull_request["number"]}}({{ pull_request["title"] }})
 against {{pull_request["base"]["repo"]["full_name"]}} by {{sender.login}}
 {{pull_request["html_url"]}}
 was reviewed by {{sender["login"]}}
-{{review["content"]}}
-
-            """
+{{review["content"]}}"""
 
         elif kwargs["action"] == "closed":
             template_text = """PR closed!
@@ -154,8 +147,7 @@ against {{pull_request["base"]["repo"]["full_name"]}}
 {{ pull_request["merged_by"]["login"] }} merged it into {{pull_request["base"]["repo"]["full_name"]}}
 {% else %}
 {{sender.login}} closed it
-{% endif %}
-            """
+{% endif %}"""
         else:
             template_text = json.dumps(kwargs)
         self.template = Template(
@@ -186,8 +178,7 @@ Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} started on {{reposit
 Steps:
 {% for s in workflow_job["steps"] %}
 - {{s["name"]}}
-{% endfor %}
-            """
+{% endfor %}"""
         elif kwargs["action"] == "completed":
             template_text = """Workflow completed
 Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} on {{repository["full_name"]}} completed
@@ -201,8 +192,7 @@ Steps:
         elif kwargs["action"] == "queued":
             template_text = """New workflow queued!
 Workflow #{{workflow_job["id"]}}-{{workflow_job["run_id"]}} queued for {{repository["full_name"]}}
-{{workflow_job["html_url"]}}
-            """
+{{workflow_job["html_url"]}}"""
 
         else:
             template_text = json.dumps(kwargs)

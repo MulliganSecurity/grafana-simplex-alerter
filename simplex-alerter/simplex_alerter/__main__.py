@@ -1,8 +1,9 @@
-from .webhook import get_app, set_endpoint
+from .webhook import get_app, set_endpoint, set_db_path
 import uvicorn
 import argparse
 from observlib import configure_telemetry
 from .config import load_config
+from .chat import init_chat
 
 
 def run():
@@ -32,7 +33,7 @@ def run():
         default="127.0.0.1:7898",
     )
     parser.add_argument(
-        "-d",
+        "-D",
         "--debug",
         action="store_true",
         help="enable debug mode, increases pyroscope sampling rate if configured",
@@ -56,6 +57,25 @@ def run():
         dest="endpoint",
     )
 
+    parser.add_argument(
+        "-p",
+        "--profile-name",
+        action="store",
+        help="simplex bot name",
+        default="alertBot",
+        dest="profile",
+    )
+
+    parser.add_argument(
+        "-d",
+        "--db-path",
+        action="store",
+        help="path for chatdb",
+        default="/alerterconfig/chatDB",
+        dest="db_path",
+    )
+
+
     args = parser.parse_args()
 
     if not args.config:
@@ -72,8 +92,11 @@ def run():
         args.debug,
     )
 
+    init_chat(args.profile, args.db_path)
+
     [host, port] = args.bind_addr.split(":")
 
     set_endpoint(f"ws://{args.endpoint}")
+    set_db_path(args.db_path)
     app = get_app()
     uvicorn.run(app, host=host, port=int(port))

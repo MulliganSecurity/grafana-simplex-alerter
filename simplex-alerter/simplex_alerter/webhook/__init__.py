@@ -1,4 +1,7 @@
 import json
+from builtins import ConnectionRefusedError
+import subprocess
+import asyncio
 from typing import Union
 from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
@@ -8,8 +11,9 @@ from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter
 from opentelemetry import trace
-from simpx.client import ChatClient
-from simpx.command import ChatType
+from simplex_alerter.simpx.client import ChatClient
+from simplex_alerter.config import CONNECTION_ATTEMPTS
+from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
 
@@ -20,6 +24,7 @@ app = FastAPI()
 
 
 simplex_endpoint = None
+db_path = None
 
 
 @lru_cache(maxsize=None)
@@ -60,6 +65,9 @@ def set_endpoint(endpoint):
     global simplex_endpoint
     simplex_endpoint = endpoint
 
+def set_db_path(folder):
+    global db_path
+    db_path = folder
 
 async def get_groups(group_data):
     groups = {}
@@ -75,7 +83,7 @@ async def get_groups(group_data):
 @app.on_event("startup")
 @traced(
     tracer=traced_conf["tracer"],
-    timing_histogram={
+    timer={
         "name": "execution_timer",
         "unit": "ms",
         "description": "function execution duration",
@@ -83,16 +91,35 @@ async def get_groups(group_data):
     timer_factory=get_timer,
 )
 async def startup_event():
-    global simplex_endpoint
-    span = trace.get_current_span()
+    host_port = simplex_endpoint.split(':')
     logger = getLogger(service_name)
+    logger.info("starting chat client on {}".format(host_port[2]))
+    subprocess.Popen(
+        ["simplex-chat", "-y", "-p", host_port[2], "-d", db_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+
+    span = trace.get_current_span()
 
     span.add_event("initializing client", attributes={"endpoint": simplex_endpoint})
     logger.info("initializing client", extra={"endpoint": simplex_endpoint})
-    client = await ChatClient.create(simplex_endpoint)
+    while True:
+        try:
+            client = await ChatClient.create(simplex_endpoint)
+            break
+        except ConnectionRefusedError:
+            logger.info("waiting for the chat client to connect")
+            await asyncio.sleep(1)
+
+    logger.info("retrieving config")
     config = get_config()
 
+    logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
+    logger.info("groups from client",extra = {"groups": groups})
+    logger.info("groups from config", extra = {"goups":config["alert_groups"]})
     for group in config["alert_groups"]:
         if group["endpoint_name"] in groups.keys():
             continue
@@ -108,7 +135,17 @@ async def startup_event():
                 "joining group",
                 attributes={"message": "joining group", "group": custom_group_name},
             )
-            await client.api_connect(group["invite_link"])
+            attempts = 0
+            while attempts < CONNECTION_ATTEMPTS:
+                try:
+                    logger.info(f"attempting join on {custom_group_name}")
+                    await client.api_connect(group["invite_link"])
+                    logger.info(f"joined group {custom_group_name}")
+                    break
+                except:
+                    logger.info("waiting for 5 seconds before retrying join")
+                    asyncio.sleep(5)
+                    attempts += 1
 
 
 @app.on_event("shutdown")
