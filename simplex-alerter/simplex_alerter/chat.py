@@ -11,3 +11,8 @@ def init_chat(profile_name,db_path):
         chat.sendline(profile_name)
         chat.expect("Current user: .*")
     logger.info("simplex-chat db initialized")
+
+async def monitor_channels(config, client):
+    while True:
+        msg = await client.msg_q.dequeue()
+        print(f"received: {msg}")

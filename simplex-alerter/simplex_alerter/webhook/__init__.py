@@ -16,6 +16,7 @@ from simplex_alerter.config import CONNECTION_ATTEMPTS
 from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
+from simplex_alerter.chat import monitor_channels
 
 service_name = "simpleX-alerter"
 
@@ -116,6 +117,11 @@ async def startup_event():
     logger.info("retrieving config")
     config = get_config()
 
+    logger.info("starting channel monitor for deadman's switch capabilities")
+    span.add_event("starting listener routine")
+    loop = asyncio.get_running_loop()
+    loop.create_task(monitor_channels(config,client))
+
     logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
     logger.info("groups from client",extra = {"groups": groups})
@@ -172,6 +178,8 @@ async def post_message(
     global simplex_endpoint
     span.add_event("creating client")
     client = await ChatClient.create(simplex_endpoint)
+
+
     span.add_event("getting latest groups")
     groups = await get_groups(await client.api_get_groups())
 
