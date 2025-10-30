@@ -33,9 +33,9 @@ let
   };
   ubuntu = pkgs.dockerTools.pullImage {
     imageName = "ubuntu";
-    imageDigest = "sha256:b59d21599a2b151e23eea5f6602f4af4d7d31c4e236d22bf0b62b86d2e386b8f";
+    imageDigest = "sha256:9b61739164b58f2263067bd3ab31c7746ded4cade1f9d708e6f1b047b408a470";
     finalImageName = "ubuntu";
-    sha256 = "sha256-YdbJusA6R6SRxpoMZzQI/F0XoIw2cQKlz4FMvbAHGoA=";
+    sha256 = "sha256-PvB8IMmuvwewsnQYjcfGB8eaAkYqf8aaIJyQ66XgJ+M=";
   };
   alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
 
