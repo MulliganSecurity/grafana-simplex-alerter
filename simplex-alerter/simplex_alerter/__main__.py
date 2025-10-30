@@ -85,11 +85,18 @@ def run():
     sname = "simpleX-alerter"
     load_config(args.config)
 
+    sample_rate = 5
+    attrs = {}
+    if args.debug:
+        sample_rate = 100
+        attrs = {"environment":"dev"}
+
     configure_telemetry(
         sname,
         args.otel_server,
         args.pyroscope_server,
-        args.debug,
+        sample_rate,
+        resource_attrs = attrs,
     )
 
     init_chat(args.profile, args.db_path)
