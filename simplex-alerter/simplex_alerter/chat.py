@@ -10,6 +10,7 @@ def init_chat(profile_name,db_path):
         logger.info("configuring profile name", extra = {"profile_name":profile_name})
         chat.sendline(profile_name)
         chat.expect("Current user: .*")
+        logger.info("current user filled")
     logger.info("simplex-chat db initialized")
 
 async def monitor_channels(config, client):
