@@ -1,4 +1,5 @@
 import json
+from exceptions import FileNotFoundError
 from builtins import ConnectionRefusedError
 import subprocess
 import asyncio
@@ -16,7 +17,7 @@ from simplex_alerter.config import CONNECTION_ATTEMPTS
 from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
-from simplex_alerter.chat import monitor_channels
+from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier
 
 service_name = "simpleX-alerter"
 
@@ -80,6 +81,27 @@ async def get_groups(group_data):
                 )
     return groups
 
+def load_liveness_data(config):
+    data_path = "/alerterconfig/ddms.pickle"
+    user_liveness_data = {} 
+    try:
+        with open(data_path, "rb") as fh:
+            user_liveness_data = pickle.load(data_path)
+    except FileNotFoundError:
+        pass
+
+    sw_config = config.get("deadmans_switch")
+    if sw_config:
+        for user, alert_config in sw_config.items():
+            user_liveness_data[user] |= alert_config #update alert thresholds if required
+            if "last_seen" not in user_liveness_data[user]:
+                user_liveness_data["last_seen"] = time.now()
+            if "alert_sent" not in user_liveness_data[user]:
+                alert_sent = False
+            if "switch_triggered" not in user_liveness_data[user]:
+                switch_triggered = False
+    return user_liveness_data
+
 
 @app.on_event("startup")
 @traced(
@@ -120,7 +142,9 @@ async def startup_event():
     logger.info("starting channel monitor for deadman's switch capabilities")
     span.add_event("starting listener routine")
     loop = asyncio.get_running_loop()
-    loop.create_task(monitor_channels(config,client))
+    liveness_data = load_liveness_data(config)
+    loop.create_task(monitor_channels(liveness_data,client))
+    loop.create_task(deadmans_switch_notifier(liveness_data,client))
 
     logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
@@ -150,7 +174,7 @@ async def startup_event():
                     break
                 except:
                     logger.info("waiting for 5 seconds before retrying join")
-                    asyncio.sleep(5)
+                    await asyncio.sleep(5)
                     attempts += 1
 
 
