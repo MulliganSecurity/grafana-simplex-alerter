@@ -1,7 +1,6 @@
 import pexpect
 import base64
 from simplex_alerter.simpx.command import ChatType
-from .webhook import get_groups
 import aiofiles
 from datetime import datetime
 import asyncio
@@ -10,6 +9,16 @@ import json
 from logging import getLogger
 
 logger = getLogger(__name__)
+
+async def get_groups(group_data):
+    groups = {}
+    if len(group_data["groups"]) > 0:
+        for group_data_entry in group_data["groups"]:
+            if "groupProfile" in group_data_entry[0]:
+                groups[group_data_entry[0]["groupProfile"]["displayName"]] = (
+                    group_data_entry[0]["groupId"]
+                )
+    return groups
 
 
 def init_chat(profile_name, db_path):
@@ -58,13 +67,15 @@ async def deadmans_switch_notifier(liveness_info, client):
                     )
                 else:
                     try:
+                        file_content = None
                         async with aiofiles.open(
                             config["delivered_filepath"], "rb"
                         ) as fh:
                             file_content = await fh.read()
-                            file_txt = base64.b64encode(file_content)
-                            await client.api_send_file(ChatType.Group, chatId, file_txt)
+                        file_txt = base64.b64encode(file_content)
+                        res = await client.api_send_file(ChatType.Group, chatId, file_txt.decode("ascii"))
                         config["switch_triggered"] = True
+                        logger.info("sent message")
                     except Exception as ex:
                         logger.error(f"error delivering file: {ex}")
 

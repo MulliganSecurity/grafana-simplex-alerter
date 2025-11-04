@@ -20,7 +20,7 @@ from simplex_alerter.config import CONNECTION_ATTEMPTS
 from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
-from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier
+from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier, get_groups
 
 service_name = "simpleX-alerter"
 
@@ -76,15 +76,6 @@ def set_db_path(folder):
     db_path = folder
 
 
-async def get_groups(group_data):
-    groups = {}
-    if len(group_data["groups"]) > 0:
-        for group_data_entry in group_data["groups"]:
-            if "groupProfile" in group_data_entry[0]:
-                groups[group_data_entry[0]["groupProfile"]["displayName"]] = (
-                    group_data_entry[0]["groupId"]
-                )
-    return groups
 
 
 async def load_liveness_data(config):
