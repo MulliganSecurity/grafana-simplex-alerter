@@ -1,5 +1,8 @@
 import json
-from exceptions import FileNotFoundError
+import pickle
+import aiofiles
+from datetime import datetime, timedelta
+import errno
 from builtins import ConnectionRefusedError
 import subprocess
 import asyncio
@@ -81,25 +84,35 @@ async def get_groups(group_data):
                 )
     return groups
 
-def load_liveness_data(config):
+async def load_liveness_data(config):
     data_path = "/alerterconfig/ddms.pickle"
     user_liveness_data = {} 
     try:
-        with open(data_path, "rb") as fh:
-            user_liveness_data = pickle.load(data_path)
-    except FileNotFoundError:
-        pass
+        async with aiofiles.open(data_path, "rb") as fh:
+            pickled = await fh.read()
+            user_liveness_data = pickle.loads(pickled)
+    except OSError as e:
+        if e.errno == errno.ENOENT:
+            #no existing file
+            pass
+        else:
+            raise
 
     sw_config = config.get("deadmans_switch")
     if sw_config:
         for user, alert_config in sw_config.items():
-            user_liveness_data[user] |= alert_config #update alert thresholds if required
+            alert_config["alert_threshold_seconds"] = timedelta(seconds = alert_config["alert_threshold_seconds"])
+            alert_config["trigger_threshold_seconds"] = timedelta(seconds = alert_config["trigger_threshold_seconds"])
+            if user in user_liveness_data:
+                user_liveness_data[user] |= alert_config #update alert thresholds if required
+            else:
+                user_liveness_data[user] = alert_config
             if "last_seen" not in user_liveness_data[user]:
-                user_liveness_data["last_seen"] = time.now()
+                user_liveness_data[user]["last_seen"] = datetime.now()
             if "alert_sent" not in user_liveness_data[user]:
-                alert_sent = False
+                user_liveness_data[user]["alert_sent"] = False
             if "switch_triggered" not in user_liveness_data[user]:
-                switch_triggered = False
+                user_liveness_data[user]["switch_triggered"] = False
     return user_liveness_data
 
 
@@ -142,7 +155,7 @@ async def startup_event():
     logger.info("starting channel monitor for deadman's switch capabilities")
     span.add_event("starting listener routine")
     loop = asyncio.get_running_loop()
-    liveness_data = load_liveness_data(config)
+    liveness_data = await load_liveness_data(config)
     loop.create_task(monitor_channels(liveness_data,client))
     loop.create_task(deadmans_switch_notifier(liveness_data,client))
 
