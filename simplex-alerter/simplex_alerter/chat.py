@@ -1,6 +1,7 @@
 import pexpect
 import base64
 from simplex_alerter.simpx.command import ChatType
+from .webhook import get_groups
 import aiofiles
 from datetime import datetime
 import asyncio
@@ -45,8 +46,9 @@ async def deadmans_switch_notifier(liveness_info, client):
                             file_content = await fh.read()
                             file_txt = base64.b64encode(file_content)
                             await client.api_send_file(ChatType.Group, chatId, file_txt)
-                    config["switch_triggered"] = True
-                pass #send trigger notification
+                        config["switch_triggered"] = True
+                    except Exception as ex:
+                        logger.error(f"error delivering file: {ex}")
 
 
 async def monitor_channels(liveness_info, client):
