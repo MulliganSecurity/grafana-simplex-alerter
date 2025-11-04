@@ -296,6 +296,27 @@ class ChatClient:
             [message],
             is_live=live
         )
+
+    async def api_send_file(self, 
+                                  chat_type: ChatType, 
+                                  chat_id: int, 
+                                  base64_file_content: str,
+                            ) -> List[AChatItem]:
+        """Send a file to a chat."""
+        message = {
+            "msgContent": {
+                "file": "text",
+                "text": base64_file_content,
+            }
+        }
+        return await self.api_send_messages(
+            chat_type, 
+            chat_id, 
+            [message],
+            is_live=False
+        )
+
+
     
     async def api_update_chat_item(self, 
                                  chat_type: ChatType, 
