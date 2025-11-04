@@ -70,9 +70,11 @@ def set_endpoint(endpoint):
     global simplex_endpoint
     simplex_endpoint = endpoint
 
+
 def set_db_path(folder):
     global db_path
     db_path = folder
+
 
 async def get_groups(group_data):
     groups = {}
@@ -84,16 +86,17 @@ async def get_groups(group_data):
                 )
     return groups
 
+
 async def load_liveness_data(config):
     data_path = "/alerterconfig/ddms.pickle"
-    user_liveness_data = {} 
+    user_liveness_data = {}
     try:
         async with aiofiles.open(data_path, "rb") as fh:
             pickled = await fh.read()
             user_liveness_data = pickle.loads(pickled)
     except OSError as e:
         if e.errno == errno.ENOENT:
-            #no existing file
+            # no existing file
             pass
         else:
             raise
@@ -101,10 +104,16 @@ async def load_liveness_data(config):
     sw_config = config.get("deadmans_switch")
     if sw_config:
         for user, alert_config in sw_config.items():
-            alert_config["alert_threshold_seconds"] = timedelta(seconds = alert_config["alert_threshold_seconds"])
-            alert_config["trigger_threshold_seconds"] = timedelta(seconds = alert_config["trigger_threshold_seconds"])
+            alert_config["alert_threshold_seconds"] = timedelta(
+                seconds=alert_config["alert_threshold_seconds"]
+            )
+            alert_config["trigger_threshold_seconds"] = timedelta(
+                seconds=alert_config["trigger_threshold_seconds"]
+            )
             if user in user_liveness_data:
-                user_liveness_data[user] |= alert_config #update alert thresholds if required
+                user_liveness_data[user] |= (
+                    alert_config  # update alert thresholds if required
+                )
             else:
                 user_liveness_data[user] = alert_config
             if "last_seen" not in user_liveness_data[user]:
@@ -127,7 +136,7 @@ async def load_liveness_data(config):
     timer_factory=get_timer,
 )
 async def startup_event():
-    host_port = simplex_endpoint.split(':')
+    host_port = simplex_endpoint.split(":")
     logger = getLogger(service_name)
     logger.info("starting chat client on {}".format(host_port[2]))
     subprocess.Popen(
@@ -135,7 +144,6 @@ async def startup_event():
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
-
 
     span = trace.get_current_span()
 
@@ -156,13 +164,13 @@ async def startup_event():
     span.add_event("starting listener routine")
     loop = asyncio.get_running_loop()
     liveness_data = await load_liveness_data(config)
-    loop.create_task(monitor_channels(liveness_data,client))
-    loop.create_task(deadmans_switch_notifier(liveness_data,client))
+    loop.create_task(monitor_channels(liveness_data, client))
+    loop.create_task(deadmans_switch_notifier(liveness_data, client))
 
     logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
-    logger.info("groups from client",extra = {"groups": groups})
-    logger.info("groups from config", extra = {"goups":config["alert_groups"]})
+    logger.info("groups from client", extra={"groups": groups})
+    logger.info("groups from config", extra={"goups": config["alert_groups"]})
     for group in config["alert_groups"]:
         if group["endpoint_name"] in groups.keys():
             continue
@@ -215,7 +223,6 @@ async def post_message(
     global simplex_endpoint
     span.add_event("creating client")
     client = await ChatClient.create(simplex_endpoint)
-
 
     span.add_event("getting latest groups")
     groups = await get_groups(await client.api_get_groups())

@@ -75,7 +75,6 @@ def run():
         dest="db_path",
     )
 
-
     args = parser.parse_args()
 
     if not args.config:
@@ -89,14 +88,14 @@ def run():
     attrs = {}
     if args.debug:
         sample_rate = 100
-        attrs = {"environment":"dev"}
+        attrs = {"environment": "dev"}
 
     configure_telemetry(
         sname,
         args.otel_server,
         args.pyroscope_server,
         sample_rate,
-        resource_attrs = attrs,
+        resource_attrs=attrs,
     )
 
     init_chat(args.profile, args.db_path)
