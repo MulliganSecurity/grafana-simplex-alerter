@@ -41,7 +41,7 @@ async def deadmans_switch_notifier(liveness_info, client):
                     logger.error(f"couldn't send the alert to {group} for user {user} MIA: group is not connected")
                 else:
                     try:
-                        async with aiofiles.open(config["delivered_filepath"],"rb") as fh
+                        async with aiofiles.open(config["delivered_filepath"],"rb") as fh:
                             file_content = await fh.read()
                             file_txt = base64.b64encode(file_content)
                             await client.api_send_file(ChatType.Group, chatId, file_txt)
