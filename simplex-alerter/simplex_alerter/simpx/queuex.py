@@ -1,5 +1,5 @@
 import asyncio
-from typing import Generic, TypeVar, Optional, AsyncIterator, Union, Any
+from typing import Generic, TypeVar, Union, Any
 
 T = TypeVar("T")
 QUEUE_CLOSED = object()

@@ -1,6 +1,5 @@
 from typing import Union, List, Optional, Dict, Any, Literal, TypedDict
 from enum import Enum
-from dataclasses import dataclass
 from datetime import datetime
 
 from .command import (
@@ -12,7 +11,6 @@ from .command import (
     LocalProfile,
     ServerProtocol,
     ServerCfg,
-    ChatType,
 )
 
 

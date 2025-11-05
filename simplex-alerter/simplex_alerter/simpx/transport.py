@@ -1,7 +1,7 @@
 import asyncio
 import json
 import websockets
-from typing import Generic, TypeVar, Dict, Union, Optional, Any, AsyncIterator
+from typing import Generic, TypeVar, Union, Optional
 from abc import ABC, abstractmethod
 
 from .queuex import ABQueue, ABQueueError
@@ -108,7 +108,7 @@ class WSTransport(Transport[Union[bytes, str], Union[bytes, str]]):
         try:
             async for message in self.socket:
                 await self.queue.enqueue(message)
-        except Exception as e:
+        except Exception:
             # On error, close the queue if not already closed
             if not self.queue.enq_closed:
                 await self.queue.close()

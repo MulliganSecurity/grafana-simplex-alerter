@@ -1,6 +1,5 @@
-from enum import Enum, auto
-from typing import Union, Optional, List, Dict, Any, Literal, TypedDict, overload
-from dataclasses import dataclass, field
+from enum import Enum
+from typing import Union, Optional, List, Dict, Any, Literal, TypedDict
 
 
 class ChatType(str, Enum):
@@ -493,7 +492,7 @@ def cmd_string(cmd: ChatCommand) -> str:
         "apiStopChat": lambda _: "/_stop",
         "setIncognito": lambda c: f"/incognito {on_off(c['incognito'])}",
         "apiGetGroups": lambda _: "/groups",
-        "apiGetChats": lambda c: f"/chats",
+        "apiGetChats": lambda c: "/chats",
         "apiGetChat": lambda c: f"/_get chat {c['chatType']}{c['chatId']}{pagination_str(c['pagination'])}"
         + (f" {c['search']}" if c.get("search") else ""),
         "apiSendMessage": lambda c: f"/_send {c['chatType']}{c['chatId']}"

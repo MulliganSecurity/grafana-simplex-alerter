@@ -1,14 +1,10 @@
 import pexpect
-from functools import lru_cache
-import base64
 from simplex_alerter.simpx.command import ChatType
 import aiofiles
 from datetime import datetime
 import asyncio
 import pickle
-import json
 from logging import getLogger
-from opentelemetry.metrics import get_meter
 from observlib import traced
 
 logger = getLogger(__name__)
@@ -81,10 +77,13 @@ async def deadmans_switch_notifier(liveness_info, client):
                     )
                 else:
                     try:
-                        file_content = None
-                        res = await client.api_send_file(ChatType.Group, chatId,config["delivered_filepath"] )
+                        await client.api_send_file(
+                            ChatType.Group, chatId, config["delivered_filepath"]
+                        )
                         config["switch_triggered"] = True
-                        logger.info(f"{user} has been inactive in {group} beyond the threshold, sent message")
+                        logger.info(
+                            f"{user} has been inactive in {group} beyond the threshold, sent message"
+                        )
                     except Exception as ex:
                         logger.error(f"error delivering file: {ex}")
 
@@ -111,7 +110,7 @@ async def monitor_channels(liveness_info, msg_data, client):
 
                     if liveness:
                         if member not in msg_data["users"]:
-                            msg_data["users"][member] = {group:1}
+                            msg_data["users"][member] = {group: 1}
                         else:
                             msg_data["users"][member][group] += 1
 
@@ -123,9 +122,11 @@ async def monitor_channels(liveness_info, msg_data, client):
                         logger.info(
                             f"recorded liveness for user {member} in group {group}"
                         )
-                        liveness_alert_sent = False
+                        liveness["alert_sent"] = False
                         if liveness["switch_triggered"]:
-                            logger.warn(f"{member} has come back in {group} but MIA transmission has already been executed. Reseting")
+                            logger.warn(
+                                f"{member} has come back in {group} but MIA transmission has already been executed. Reseting"
+                            )
                             liveness["switch_trigered"] = False
                 except Exception as ex:
                     logger.debug(f"no associated liveness info for user: {ex}")

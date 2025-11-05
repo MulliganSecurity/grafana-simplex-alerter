@@ -1,5 +1,4 @@
 import asyncio
-import json
 from enum import Enum
 from typing import (
     Dict,
@@ -9,9 +8,6 @@ from typing import (
     Tuple,
     Union,
     Callable,
-    TypeVar,
-    Generic,
-    cast,
 )
 
 from .queuex import ABQueue
@@ -19,10 +15,8 @@ from .transport import (
     ChatTransport,
     ChatServer,
     ChatSrvRequest,
-    ChatSrvResponse,
     ChatResponseError,
     local_server,
-    noop,
 )
 from .command import (
     ChatCommand,
@@ -46,7 +40,6 @@ from .response import (
     AChatItem,
     ChatItem,
     ConnectionStats,
-    CRChatCmdError,
     Chat,
 )
 
@@ -362,10 +355,10 @@ class ChatClient:
         message = {
             "msgContent": {
                 "type": "file",
-                "text":"transmission data",
+                "text": "transmission data",
             },
             "fileSource": {
-                "filePath" : filepath,
+                "filePath": filepath,
             },
         }
         return await self.api_send_messages(
