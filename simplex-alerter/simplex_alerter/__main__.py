@@ -1,4 +1,5 @@
 from .webhook import get_app, set_endpoint, set_db_path
+from logging import getLogger
 import uvicorn
 import argparse
 from observlib import configure_telemetry
@@ -6,6 +7,7 @@ from .config import load_config
 from .chat import init_chat
 import os
 
+logger = getLogger(__name__)
 
 def run():
     parser = argparse.ArgumentParser()
@@ -80,6 +82,7 @@ def run():
 
     otel_server = os.environ.get("OTEL_SERVER")
 
+    logger.info(f"starting with otel server {otel_server}, pyroscope server {pyroscope_server}")
     configure_telemetry(
         sname,
         otel_server,
