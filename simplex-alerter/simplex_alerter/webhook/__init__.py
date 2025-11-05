@@ -1,4 +1,5 @@
 import json
+import time
 import pickle
 import aiofiles
 from datetime import datetime, timedelta
@@ -13,7 +14,7 @@ from observlib import traced
 from fastapi import FastAPI, HTTPException, Response, Request
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
-from opentelemetry.metrics import get_meter
+from opentelemetry.metrics import get_meter, CallbackOptions, Observation
 from opentelemetry import trace
 from simplex_alerter.simpx.client import ChatClient
 from simplex_alerter.config import CONNECTION_ATTEMPTS
@@ -76,11 +77,12 @@ def set_db_path(folder):
     db_path = folder
 
 
-
+user_liveness_data = {}
+message_data = {"groups":{}, "users":{}}
 
 async def load_liveness_data(config):
     data_path = "/alerterconfig/ddms.pickle"
-    user_liveness_data = {}
+    global user_liveness_data
     try:
         async with aiofiles.open(data_path, "rb") as fh:
             pickled = await fh.read()
@@ -113,8 +115,27 @@ async def load_liveness_data(config):
                 user_liveness_data[user]["alert_sent"] = False
             if "switch_triggered" not in user_liveness_data[user]:
                 user_liveness_data[user]["switch_triggered"] = False
-    return user_liveness_data
 
+def user_liveness_callback(options:CallbackOptions):
+    for user, config in user_liveness_data.items():
+        attrs = {"user":user,"group":config["group"]}
+        yield Observation(time.mktime(config["last_seen"].timetuple()), attributes = attrs)
+        yield Observation(int(config["alert_sent"]), attributes = attrs)
+        yield Observation(int(config["switch_triggered"]), attribute = attrs)
+
+        for group,value in message_data["groups"].items():
+            yield Observation(value, attributes = {"group":g, "type":"messages_received"})
+
+        for user,groups in message_data["users"].items():
+            for group, value in groups.items():
+                yield Observation(value, attributes = {"user":u, "group": group, "type": "messages_sent", "critical_for_user": int(group == user_liveness_data[user]["group"])})
+
+async def initialize_telemetry():
+    meter = get_meter(service_name)
+    meter.create_observable_up_down_counter(
+            name = "simplex_alerter_user_last_seen",
+            callbacks = [user_liveness_callback],
+            description = "deadman switch data")
 
 @app.on_event("startup")
 @traced(
@@ -127,6 +148,8 @@ async def load_liveness_data(config):
     timer_factory=get_timer,
 )
 async def startup_event():
+    global user_liveness_data
+    global message_data
     host_port = simplex_endpoint.split(":")
     logger = getLogger(service_name)
     logger.info("starting chat client on {}".format(host_port[2]))
@@ -154,9 +177,9 @@ async def startup_event():
     logger.info("starting channel monitor for deadman's switch capabilities")
     span.add_event("starting listener routine")
     loop = asyncio.get_running_loop()
-    liveness_data = await load_liveness_data(config)
-    loop.create_task(monitor_channels(liveness_data, client))
-    loop.create_task(deadmans_switch_notifier(liveness_data, client))
+    await load_liveness_data(config)
+    loop.create_task(monitor_channels(user_liveness_data,message_data, client))
+    loop.create_task(deadmans_switch_notifier(user_liveness_data, client))
 
     logger.info("retrieving groups")
     groups = await get_groups(await client.api_get_groups())
