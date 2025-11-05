@@ -50,6 +50,7 @@ async def deadmans_switch_notifier(liveness_info, client):
         await asyncio.sleep(1)
         groups = await get_groups(await client.api_get_groups())
         for user, config in liveness_info.items():
+            group = config["group"]
             if (
                 datetime.now() > config["last_seen"] + config["alert_threshold_seconds"]
                 and not config["alert_sent"]
@@ -82,9 +83,8 @@ async def deadmans_switch_notifier(liveness_info, client):
                     try:
                         file_content = None
                         res = await client.api_send_file(ChatType.Group, chatId,config["delivered_filepath"] )
-                        logger.info(f"{res}")
                         config["switch_triggered"] = True
-                        logger.info("sent message")
+                        logger.info(f"{user} has been inactive in {group} beyond the threshold, sent message")
                     except Exception as ex:
                         logger.error(f"error delivering file: {ex}")
 
@@ -123,5 +123,9 @@ async def monitor_channels(liveness_info, msg_data, client):
                         logger.info(
                             f"recorded liveness for user {member} in group {group}"
                         )
+                        liveness_alert_sent = False
+                        if liveness["switch_triggered"]:
+                            logger.warn(f"{member} has come back in {group} but MIA transmission has already been executed. Reseting")
+                            liveness["switch_trigered"] = False
                 except Exception as ex:
                     logger.debug(f"no associated liveness info for user: {ex}")
