@@ -7,6 +7,6 @@ deadmans_switch:
     group: "alerttest" # same groupname as above
     alert_threshold_seconds: 30
     trigger_threshold_seconds: 60
-    trigger_message: "they ded"
+    alert_message: "they ded"
     inheritance_filepath: "/alerterconfig/mysikkritfile.zip"
     inheritance_message: "here's the secret data"

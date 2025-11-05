@@ -61,7 +61,7 @@ async def deadmans_switch_notifier(liveness_info, client):
                     )
                 else:
                     await client.api_send_text_message(
-                        ChatType.Group, chatId, config["trigger_message"]
+                        ChatType.Group, chatId, config["alert_message"]
                     )
                     config["alert_sent"] = True
 
