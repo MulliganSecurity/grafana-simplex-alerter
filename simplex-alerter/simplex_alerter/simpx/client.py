@@ -350,12 +350,13 @@ class ChatClient:
         chat_type: ChatType,
         chat_id: int,
         filepath: str,
+        text_message: str,
     ) -> List[AChatItem]:
         """Send a file to a chat."""
         message = {
             "msgContent": {
                 "type": "file",
-                "text": "transmission data",
+                "text": text_message,
             },
             "fileSource": {
                 "filePath": filepath,

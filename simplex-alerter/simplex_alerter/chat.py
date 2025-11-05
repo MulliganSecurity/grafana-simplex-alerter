@@ -78,7 +78,7 @@ async def deadmans_switch_notifier(liveness_info, client):
                 else:
                     try:
                         await client.api_send_file(
-                            ChatType.Group, chatId, config["delivered_filepath"]
+                            ChatType.Group, chatId, config["inheritance_filepath"], config["inheritance_message"]
                         )
                         config["switch_triggered"] = True
                         logger.info(
