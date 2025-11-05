@@ -356,14 +356,17 @@ class ChatClient:
         self,
         chat_type: ChatType,
         chat_id: int,
-        base64_file_content: str,
+        filepath: str,
     ) -> List[AChatItem]:
         """Send a file to a chat."""
         message = {
             "msgContent": {
-                "file": "text",
-                "text": base64_file_content,
-            }
+                "type": "file",
+                "text":"transmission data",
+            },
+            "fileSource": {
+                "filePath" : filepath,
+            },
         }
         return await self.api_send_messages(
             chat_type, chat_id, [message], is_live=False
