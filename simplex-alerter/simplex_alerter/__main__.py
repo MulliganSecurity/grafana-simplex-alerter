@@ -4,26 +4,11 @@ import argparse
 from observlib import configure_telemetry
 from .config import load_config
 from .chat import init_chat
+import os
 
 
 def run():
     parser = argparse.ArgumentParser()
-    parser.add_argument(
-        "-o",
-        "--opentelemetry",
-        action="store",
-        help="opentelemetry server",
-        dest="otel_server",
-        default=None,
-    )
-    parser.add_argument(
-        "-f",
-        "--profiling",
-        action="store",
-        help="pyroscope server address for profiling",
-        dest="pyroscope_server",
-        default=None,
-    )
     parser.add_argument(
         "-b",
         "--bind-addr",
@@ -89,11 +74,16 @@ def run():
     if args.debug:
         sample_rate = 100
         attrs = {"environment": "dev"}
+        pyroscope_server = os.environ.get("PYROSCOPE_DEV_SERVER")
+    else:
+        pyroscope_server = os.environ.get("PYROSCOPE_SERVER")
+
+    otel_server = os.environ.get("OTEL_SERVER")
 
     configure_telemetry(
         sname,
-        args.otel_server,
-        args.pyroscope_server,
+        otel_server,
+        pyroscope_server,
         sample_rate,
         resource_attrs=attrs,
     )
