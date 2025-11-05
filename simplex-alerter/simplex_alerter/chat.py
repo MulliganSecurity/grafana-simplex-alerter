@@ -1,4 +1,5 @@
 import pexpect
+from functools import lru_cache
 import base64
 from simplex_alerter.simpx.command import ChatType
 import aiofiles
@@ -7,9 +8,19 @@ import asyncio
 import pickle
 import json
 from logging import getLogger
+from opentelemetry.metrics import get_meter
+from observlib import traced
 
 logger = getLogger(__name__)
 
+service_name = "simpleX-alerter"
+
+traced_conf = {
+    "tracer": service_name,
+}
+
+
+@traced(**traced_conf)
 async def get_groups(group_data):
     groups = {}
     if len(group_data["groups"]) > 0:
@@ -21,6 +32,7 @@ async def get_groups(group_data):
     return groups
 
 
+@traced(**traced_conf)
 def init_chat(profile_name, db_path):
     chat = pexpect.spawn(f"simplex-chat -y -p 7897 -d {db_path}")
     idx = chat.expect(["display name:", "Current user: .*"])
@@ -32,6 +44,7 @@ def init_chat(profile_name, db_path):
     logger.info("simplex-chat db initialized")
 
 
+@traced(**traced_conf)
 async def deadmans_switch_notifier(liveness_info, client):
     while True:
         await asyncio.sleep(1)
@@ -68,19 +81,16 @@ async def deadmans_switch_notifier(liveness_info, client):
                 else:
                     try:
                         file_content = None
-                        async with aiofiles.open(
-                            config["delivered_filepath"], "rb"
-                        ) as fh:
-                            file_content = await fh.read()
-                        file_txt = base64.b64encode(file_content)
-                        res = await client.api_send_file(ChatType.Group, chatId, file_txt.decode("ascii"))
+                        res = await client.api_send_file(ChatType.Group, chatId,config["delivered_filepath"] )
+                        logger.info(f"{res}")
                         config["switch_triggered"] = True
                         logger.info("sent message")
                     except Exception as ex:
                         logger.error(f"error delivering file: {ex}")
 
 
-async def monitor_channels(liveness_info, client):
+@traced(**traced_conf)
+async def monitor_channels(liveness_info, msg_data, client):
     data_path = "/alerterconfig/ddms.pickle"
     while True:
         msg = await client.msg_q.dequeue()
@@ -91,7 +101,20 @@ async def monitor_channels(liveness_info, client):
                     member = item["chatItem"]["chatDir"]["groupMember"][
                         "memberProfile"
                     ]["displayName"]
+
+                    if group not in msg_data["groups"]:
+                        msg_data["groups"][group] = 1
+                    else:
+                        msg_data["groups"][group] += 1
+
                     liveness = liveness_info.get(member)
+
+                    if liveness:
+                        if member not in msg_data["users"]:
+                            msg_data["users"][member] = {group:1}
+                        else:
+                            msg_data["users"][member][group] += 1
+
                     if liveness and group == liveness["group"]:
                         liveness["last_seen"] = datetime.now()
                         pickled = pickle.dumps(liveness_info)
