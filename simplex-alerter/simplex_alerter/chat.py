@@ -1,4 +1,5 @@
 import pexpect
+from .config import get_config
 from simplex_alerter.simpx.command import ChatType
 import aiofiles
 from datetime import datetime
@@ -30,11 +31,13 @@ async def get_groups(group_data):
 
 @traced(**traced_conf)
 def init_chat(profile_name, db_path):
+    config = get_config()
+    username = config.get("bot_name") or profile_name #use bot name from config file or default to CLI arg
     chat = pexpect.spawn(f"simplex-chat -y -p 7897 -d {db_path}")
     idx = chat.expect(["display name:", "Current user: .*"])
     if idx == 0:
         logger.info("configuring profile name", extra={"profile_name": profile_name})
-        chat.sendline(profile_name)
+        chat.sendline(username)
         chat.expect("Current user: .*")
         logger.info("current user filled")
     logger.info("simplex-chat db initialized")
