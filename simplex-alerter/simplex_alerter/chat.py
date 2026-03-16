@@ -40,7 +40,7 @@ def init_chat(profile_name, db_path):
         chat.sendline(username)
         chat.expect("Current user: .*")
         logger.info("current user filled")
-    logger.info("simplex-chat db initialized")
+    logger.info(f"simplex-chat db initialized with user {username}")
 
 
 @traced(**traced_conf)

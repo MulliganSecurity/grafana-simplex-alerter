@@ -19,41 +19,45 @@ let
     inherit inputs lib pkgs;
     package_name = namespace;
   };
-  env = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
-  simplex-chat = pkgs.stdenv.mkDerivation rec {
-    name = "simplex-chat";
-    version = "v6.3.4";
-    src = pkgs.fetchurl {
-      url = "https://github.com/simplex-chat/simplex-chat/releases/download/${version}/simplex-chat-ubuntu-24_04-x86-64";
-      hash = "sha256-8A2jqRaRYy7okGDD8Q8Gx7ZttxXhcSDsFRKvvdbyZHc=";
-    };
-    dontBuild = true;
-    dontUnpack = true;
-    installPhase = "mkdir -p $out/bin; cp $src $out/bin/simplex-chat; chmod +x $out/bin/simplex-chat";
-  };
-  ubuntu = pkgs.dockerTools.pullImage {
-    imageName = "ubuntu";
-    imageDigest = "sha256:9b61739164b58f2263067bd3ab31c7746ded4cade1f9d708e6f1b047b408a470";
-    finalImageName = "ubuntu";
-    sha256 = "sha256-PvB8IMmuvwewsnQYjcfGB8eaAkYqf8aaIJyQ66XgJ+M=";
-  };
+
+  # Get simplex-chat from upstream flake (v6.4.10)
+  simplex-chat = inputs.simplex-chat.packages.${pkgs.system}."exe:simplex-chat";
+
+  # Python alerter virtualenv
   alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
+
+  # Runtime dependencies needed by simplex-chat
+  runtimeDeps = with pkgs; [
+    zlib        # libz
+    openssl     # openssl
+    gmp         # gmp
+    glibc       # C runtime
+  ];
 
 in
 pkgs.dockerTools.buildImage {
   name = "simplex-alerter";
   tag = "latest";
-  fromImage = ubuntu;
+
+  # Building from scratch (no Ubuntu base)
   copyToRoot = pkgs.buildEnv {
     name = "image-root";
     paths = [
       alerter
       simplex-chat
-    ];
-    pathsToLink = [ "/bin" ];
+      # Include runtime dependencies and basic utilities
+      pkgs.coreutils      # Basic utilities
+      pkgs.bash           # Shell for entrypoint
+    ] ++ runtimeDeps;
+    pathsToLink = [ "/bin" "/lib" "/lib64" ];  # Include library paths
   };
+
   config = {
     ExposedPorts."7898" = { };
+    Env = [
+      # Set library path for runtime linking
+      "LD_LIBRARY_PATH=/lib:/lib64"
+    ];
     EntryPoint = [
       "/bin/simplex-alerter"
       "-b"

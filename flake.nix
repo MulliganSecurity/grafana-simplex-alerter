@@ -30,6 +30,11 @@
     };
 
     fb-observlib.url = "github:ForgottenBeast/observlib";
+
+    simplex-chat = {
+      url = "github:simplex-chat/simplex-chat/v6.4.10";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
