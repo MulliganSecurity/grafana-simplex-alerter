@@ -1,0 +1,107 @@
+name: CI
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Ruff check
+        run: nix develop --command ruff check simplex-alerter/
+      - name: Statix check
+        run: nix develop --command statix check
+      - name: Deadnix check
+        run: nix develop --command deadnix .
+
+  typecheck:
+    name: Type check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Pyright
+        run: nix develop --command pyright simplex-alerter/
+
+  security:
+    name: Security scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Bandit
+        run: nix develop --command bandit -r simplex-alerter/simplex_alerter/
+
+  test:
+    name: Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - uses: astral-sh/setup-uv@v3
+      - name: Run tests
+        working-directory: simplex-alerter
+        run: uv run pytest --cov=simplex_alerter --cov-report=xml tests/
+
+  build:
+    name: Nix build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, security, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Build
+        run: nix build
+
+  docker-build:
+    name: Docker image build
+    runs-on: ubuntu-latest
+    needs: [lint, typecheck, security, test]
+    if: github.ref == 'refs/heads/master'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/install-nix-action@v31
+        with:
+          extra_nix_config: "accept-flake-config = true"
+      - uses: nix-community/cache-nix-action@v6
+        with:
+          primary-key: nix-${{ runner.os }}-${{ hashFiles('**/*.nix', 'flake.lock') }}
+          restore-prefixes-first-match: nix-${{ runner.os }}-
+      - name: Build Docker image
+        run: nix build .#docker-image

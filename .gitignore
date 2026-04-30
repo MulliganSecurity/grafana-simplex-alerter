@@ -1,6 +1,7 @@
 result
 *.vim
 *.yml
+!.github/**/*.yml
 *.db
 .direnv/*
 .omc
