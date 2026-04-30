@@ -31,9 +31,18 @@
 
     fb-observlib.url = "github:ForgottenBeast/observlib";
 
-    simplex-chat = {
-      url = "github:simplex-chat/simplex-chat/v6.4.10";
+    simplex = {
+      url = "github:simplex-chat/simplex-chat/v6.4.11";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    simplexmq-src = {
+      url = "github:simplex-chat/simplexmq/v6.4.4";
+      flake = false;
+    };
+
+    haskell-nix = {
+      url = "github:input-output-hk/haskell.nix/armv7a";
     };
   };
 
