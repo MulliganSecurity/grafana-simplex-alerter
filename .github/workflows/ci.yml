@@ -93,7 +93,6 @@ jobs:
     name: Docker image build
     runs-on: ubuntu-latest
     needs: [lint, typecheck, security, test]
-    if: github.ref == 'refs/heads/master'
     steps:
       - uses: actions/checkout@v4
       - uses: DeterminateSystems/install-nix-action@v31
@@ -105,3 +104,7 @@ jobs:
           restore-prefixes-first-match: nix-${{ runner.os }}-
       - name: Build Docker image
         run: nix build .#docker-image
+      - name: Smoke test — load image and verify entrypoint
+        run: |
+          image_tag=$(docker load < result | awk '{print $NF}')
+          docker run --rm "$image_tag" --help
