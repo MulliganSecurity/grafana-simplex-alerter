@@ -127,7 +127,7 @@ async def monitor_channels(liveness_info, msg_data, client):
                         )
                         liveness["alert_sent"] = False
                         if liveness["switch_triggered"]:
-                            logger.warn(
+                            logger.warning(
                                 f"{member} has come back in {group} but MIA transmission has already been executed. Reseting"
                             )
                             liveness["switch_triggered"] = False

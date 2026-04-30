@@ -125,7 +125,7 @@ def user_liveness_callback(options: CallbackOptions):
             time.mktime(config["last_seen"].timetuple()), attributes=attrs
         )
         yield Observation(int(config["alert_sent"]), attributes=attrs)
-        yield Observation(int(config["switch_triggered"]), attribute=attrs)
+        yield Observation(int(config["switch_triggered"]), attributes=attrs)
 
         for group, value in message_data["groups"].items():
             yield Observation(

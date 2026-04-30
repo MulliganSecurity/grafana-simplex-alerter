@@ -51,7 +51,7 @@ event: {{eventType}}
         )
 
     async def render(self):
-        return await self.template.render_async(self.model_dump())
+        return await self.template.render_async(**self.model_dump())
 
 
 ServarrAlert = Union[SonarrAlert]
