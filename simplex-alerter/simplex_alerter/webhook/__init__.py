@@ -2,6 +2,7 @@ import json
 import re
 import time
 import aiofiles
+from contextlib import asynccontextmanager
 from datetime import datetime, timedelta
 import errno
 from pathlib import Path
@@ -28,11 +29,86 @@ from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier, get
 service_name = "simpleX-alerter"
 
 
-app = FastAPI()
-
-
 simplex_endpoint = None
 db_path = None
+
+
+@asynccontextmanager
+async def lifespan(fastapi_app: FastAPI):
+    fastapi_app.state.user_liveness_data = {}
+    fastapi_app.state.message_data = {"groups": {}, "users": {}}
+    logger = getLogger(service_name)
+    parsed = simplex_endpoint.rsplit(":", 1)
+    if len(parsed) != 2:
+        raise ValueError(f"Invalid simplex endpoint format: {simplex_endpoint!r}")
+    simplex_port = parsed[1]
+    logger.info(f"starting chat client on {simplex_port}")
+    subprocess.Popen(
+        ["simplex-chat", "-y", "-p", simplex_port, "-d", db_path],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+    )
+
+    span = trace.get_current_span()
+    span.add_event("initializing client", attributes={"endpoint": simplex_endpoint})
+    logger.info("initializing client", extra={"endpoint": simplex_endpoint})
+    while True:
+        try:
+            client = await ChatClient.create(simplex_endpoint)
+            break
+        except ConnectionRefusedError:
+            logger.info("waiting for the chat client to connect")
+            await asyncio.sleep(1)
+
+    fastapi_app.state.chat_client = client
+
+    logger.info("retrieving config")
+    config = get_config()
+
+    logger.info("starting channel monitor for deadman's switch capabilities")
+    span.add_event("starting listener routine")
+    loop = asyncio.get_running_loop()
+    await load_liveness_data(fastapi_app, config)
+    loop.create_task(
+        monitor_channels(fastapi_app.state.user_liveness_data, fastapi_app.state.message_data, client)
+    )
+    loop.create_task(deadmans_switch_notifier(fastapi_app.state.user_liveness_data, client))
+
+    logger.info("retrieving groups")
+    groups = await get_groups(await client.api_get_groups())
+    logger.info("groups from client", extra={"groups": groups})
+    logger.info("groups from config", extra={"goups": config["alert_groups"]})
+    for group in config["alert_groups"]:
+        if group["endpoint_name"] in groups.keys():
+            continue
+        custom_group_name = group.get("group_name")
+        if custom_group_name:
+            endpoint_group_map[group["endpoint_name"]] = custom_group_name
+        else:
+            custom_group_name = group["endpoint_name"]
+
+        if "invite_link" in group:
+            logger.info("joining group", extra={"group": custom_group_name})
+            span.add_event(
+                "joining group",
+                attributes={"message": "joining group", "group": custom_group_name},
+            )
+            attempts = 0
+            while attempts < CONNECTION_ATTEMPTS:
+                try:
+                    logger.info(f"attempting join on {custom_group_name}")
+                    await client.api_connect(group["invite_link"])
+                    logger.info(f"joined group {custom_group_name}")
+                    break
+                except:
+                    logger.info("waiting for 5 seconds before retrying join")
+                    await asyncio.sleep(5)
+                    attempts += 1
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @lru_cache(maxsize=None)
@@ -91,12 +167,7 @@ def set_db_path(folder):
     db_path = folder
 
 
-user_liveness_data = {}
-message_data = {"groups": {}, "users": {}}
-
-
-async def load_liveness_data(config):
-    global user_liveness_data
+async def load_liveness_data(fastapi_app: FastAPI, config):
     logger = getLogger(service_name)
     legacy_pickle_path = Path("/alerterconfig/ddms.pickle")
     if legacy_pickle_path.exists():
@@ -112,7 +183,7 @@ async def load_liveness_data(config):
                 for k, v in data.items():
                     if k in ("last_seen",) and isinstance(v, str):
                         data[k] = datetime.fromisoformat(v)
-            user_liveness_data = loaded
+            fastapi_app.state.user_liveness_data = loaded
     except OSError as e:
         if e.errno == errno.ENOENT:
             # no existing file
@@ -120,6 +191,7 @@ async def load_liveness_data(config):
         else:
             raise
 
+    user_liveness_data = fastapi_app.state.user_liveness_data
     sw_config = config.get("deadmans_switch")
     if sw_config:
         for user, alert_config in sw_config.items():
@@ -147,6 +219,8 @@ async def load_liveness_data(config):
 
 
 def user_liveness_callback(options: CallbackOptions):
+    user_liveness_data = app.state.user_liveness_data
+    message_data = app.state.message_data
     for user, config in user_liveness_data.items():
         attrs = {"user": user, "group": config["group"]}
         yield Observation(
@@ -183,89 +257,6 @@ async def initialize_telemetry():
         description="deadman switch data",
     )
 
-
-@app.on_event("startup")
-@traced(
-    tracer=traced_conf["tracer"],
-    timer={
-        "name": "execution_timer",
-        "unit": "ms",
-        "description": "function execution duration",
-    },
-    timer_factory=get_timer,
-)
-async def startup_event():
-    global user_liveness_data
-    global message_data
-    host_port = simplex_endpoint.split(":")
-    logger = getLogger(service_name)
-    logger.info("starting chat client on {}".format(host_port[2]))
-    subprocess.Popen(
-        ["simplex-chat", "-y", "-p", host_port[2], "-d", db_path],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
-    span = trace.get_current_span()
-
-    span.add_event("initializing client", attributes={"endpoint": simplex_endpoint})
-    logger.info("initializing client", extra={"endpoint": simplex_endpoint})
-    while True:
-        try:
-            client = await ChatClient.create(simplex_endpoint)
-            break
-        except ConnectionRefusedError:
-            logger.info("waiting for the chat client to connect")
-            await asyncio.sleep(1)
-
-    app.state.chat_client = client
-
-    logger.info("retrieving config")
-    config = get_config()
-
-    logger.info("starting channel monitor for deadman's switch capabilities")
-    span.add_event("starting listener routine")
-    loop = asyncio.get_running_loop()
-    await load_liveness_data(config)
-    loop.create_task(monitor_channels(user_liveness_data, message_data, client))
-    loop.create_task(deadmans_switch_notifier(user_liveness_data, client))
-
-    logger.info("retrieving groups")
-    groups = await get_groups(await client.api_get_groups())
-    logger.info("groups from client", extra={"groups": groups})
-    logger.info("groups from config", extra={"goups": config["alert_groups"]})
-    for group in config["alert_groups"]:
-        if group["endpoint_name"] in groups.keys():
-            continue
-        custom_group_name = group.get("group_name")
-        if custom_group_name:
-            endpoint_group_map[group["endpoint_name"]] = custom_group_name
-        else:
-            custom_group_name = group["endpoint_name"]
-
-        if "invite_link" in group:
-            logger.info("joining group", extra={"group": custom_group_name})
-            span.add_event(
-                "joining group",
-                attributes={"message": "joining group", "group": custom_group_name},
-            )
-            attempts = 0
-            while attempts < CONNECTION_ATTEMPTS:
-                try:
-                    logger.info(f"attempting join on {custom_group_name}")
-                    await client.api_connect(group["invite_link"])
-                    logger.info(f"joined group {custom_group_name}")
-                    break
-                except:
-                    logger.info("waiting for 5 seconds before retrying join")
-                    await asyncio.sleep(5)
-                    attempts += 1
-
-
-@app.on_event("shutdown")
-@traced(tracer=traced_conf["tracer"])
-async def shutdown_event():
-    pass
 
 
 @app.get("/metrics")
