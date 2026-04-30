@@ -11,7 +11,8 @@ from typing import Union
 from simplex_alerter.config import get_config
 from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from observlib import traced
-from fastapi import FastAPI, HTTPException, Response, Request
+from fastapi import Depends, FastAPI, HTTPException, Response, Request
+from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from functools import lru_cache
 from opentelemetry.metrics import get_meter, CallbackOptions, Observation
@@ -60,6 +61,18 @@ traced_conf = {
 }
 
 endpoint_group_map = {}
+
+_bearer_scheme = HTTPBearer(auto_error=False)
+
+
+async def verify_token(
+    credentials: HTTPAuthorizationCredentials = Depends(_bearer_scheme),
+) -> None:
+    secret = get_config().get("webhook_secret")
+    if secret is None:
+        return
+    if credentials is None or credentials.credentials != secret:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
 
 def get_app():
@@ -201,6 +214,8 @@ async def startup_event():
             logger.info("waiting for the chat client to connect")
             await asyncio.sleep(1)
 
+    app.state.chat_client = client
+
     logger.info("retrieving config")
     config = get_config()
 
@@ -257,16 +272,18 @@ async def metrics():
     return Response(generate_latest(), media_type=CONTENT_TYPE_LATEST)
 
 
-@app.post("/{endpoint:path}")
+@app.post("/{endpoint:path}", dependencies=[Depends(verify_token)])
 @traced(**traced_conf)
 async def post_message(
     endpoint: str, request: Request, alert: Union[KnownModels, dict]
 ):
     span = trace.get_current_span()
     logger = getLogger(service_name)
-    global simplex_endpoint
-    span.add_event("creating client")
-    client = await ChatClient.create(simplex_endpoint)
+    client = app.state.chat_client
+    if not client.connected:
+        logger.info("chat client disconnected, reconnecting")
+        client = await ChatClient.create(simplex_endpoint)
+        app.state.chat_client = client
 
     span.add_event("getting latest groups")
     groups = await get_groups(await client.api_get_groups())
