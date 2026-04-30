@@ -20,7 +20,7 @@ let
   };
 
   # Get simplex-chat from upstream flake (v6.4.10)
-  simplex-chat = inputs.simplex-chat.packages.${pkgs.system}."exe:simplex-chat";
+  simplex-chat = inputs.simplex.packages.${pkgs.system}."exe:simplex-chat";
 
   externalDeps = [
     simplex-chat

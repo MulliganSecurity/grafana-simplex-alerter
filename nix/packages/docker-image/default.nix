@@ -21,7 +21,7 @@ let
   };
 
   # Get simplex-chat from upstream flake (v6.4.10)
-  simplex-chat = inputs.simplex-chat.packages.${pkgs.system}."exe:simplex-chat";
+  simplex-chat = inputs.simplex.packages.${pkgs.system}."exe:simplex-chat";
 
   # Python alerter virtualenv
   alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
@@ -45,9 +45,6 @@ pkgs.dockerTools.buildImage {
     paths = [
       alerter
       simplex-chat
-      # Include runtime dependencies and basic utilities
-      pkgs.coreutils      # Basic utilities
-      pkgs.bash           # Shell for entrypoint
     ] ++ runtimeDeps;
     pathsToLink = [ "/bin" "/lib" "/lib64" ];  # Include library paths
   };
