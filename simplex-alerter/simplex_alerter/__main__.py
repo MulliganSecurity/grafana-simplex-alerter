@@ -91,7 +91,8 @@ def run():
         resource_attrs=attrs,
     )
 
-    init_chat(args.profile, args.db_path)
+    simplex_port = args.endpoint.split(":")[-1]
+    init_chat(args.profile, args.db_path, simplex_port)
 
     [host, port] = args.bind_addr.split(":")
 
