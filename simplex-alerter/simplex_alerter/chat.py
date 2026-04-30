@@ -4,13 +4,16 @@ from simplex_alerter.simpx.command import ChatType
 import aiofiles
 from datetime import datetime
 import asyncio
-import pickle
+import json
+from pathlib import Path
 from logging import getLogger
 from observlib import traced
 
 logger = getLogger(__name__)
 
 service_name = "simpleX-alerter"
+
+LIVENESS_DATA_PATH = Path("/alerterconfig/ddms.json")
 
 traced_conf = {
     "tracer": service_name,
@@ -94,7 +97,6 @@ async def deadmans_switch_notifier(liveness_info, client):
 
 @traced(**traced_conf)
 async def monitor_channels(liveness_info, msg_data, client):
-    data_path = "/alerterconfig/ddms.pickle"
     while True:
         msg = await client.msg_q.dequeue()
         if msg["type"] == "newChatItems":
@@ -120,9 +122,12 @@ async def monitor_channels(liveness_info, msg_data, client):
 
                     if liveness and group == liveness["group"]:
                         liveness["last_seen"] = datetime.now()
-                        pickled = pickle.dumps(liveness_info)
-                        async with aiofiles.open(data_path, "wb") as fh:
-                            await fh.write(pickled)
+                        serialisable = {
+                            u: {k: (v.isoformat() if isinstance(v, datetime) else v) for k, v in d.items()}
+                            for u, d in liveness_info.items()
+                        }
+                        async with aiofiles.open(LIVENESS_DATA_PATH, "w") as fh:
+                            await fh.write(json.dumps(serialisable))
                         logger.info(
                             f"recorded liveness for user {member} in group {group}"
                         )

@@ -1,9 +1,9 @@
 import json
 import time
-import pickle
 import aiofiles
 from datetime import datetime, timedelta
 import errno
+from pathlib import Path
 from builtins import ConnectionRefusedError
 import subprocess
 import asyncio
@@ -21,7 +21,7 @@ from simplex_alerter.config import CONNECTION_ATTEMPTS
 from simplex_alerter.simpx.command import ChatType
 from logging import getLogger
 from .request_models import KnownModels
-from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier, get_groups
+from simplex_alerter.chat import monitor_channels, deadmans_switch_notifier, get_groups, LIVENESS_DATA_PATH
 
 service_name = "simpleX-alerter"
 
@@ -82,12 +82,23 @@ message_data = {"groups": {}, "users": {}}
 
 
 async def load_liveness_data(config):
-    data_path = "/alerterconfig/ddms.pickle"
     global user_liveness_data
+    logger = getLogger(service_name)
+    legacy_pickle_path = Path("/alerterconfig/ddms.pickle")
+    if legacy_pickle_path.exists():
+        logger.warning(
+            f"Legacy pickle state file detected at {legacy_pickle_path}. "
+            "It will be ignored; starting fresh. Remove it manually."
+        )
     try:
-        async with aiofiles.open(data_path, "rb") as fh:
-            pickled = await fh.read()
-            user_liveness_data = pickle.loads(pickled)
+        async with aiofiles.open(LIVENESS_DATA_PATH, "r") as fh:
+            raw = await fh.read()
+            loaded = json.loads(raw)
+            for user, data in loaded.items():
+                for k, v in data.items():
+                    if k in ("last_seen",) and isinstance(v, str):
+                        data[k] = datetime.fromisoformat(v)
+            user_liveness_data = loaded
     except OSError as e:
         if e.errno == errno.ENOENT:
             # no existing file
