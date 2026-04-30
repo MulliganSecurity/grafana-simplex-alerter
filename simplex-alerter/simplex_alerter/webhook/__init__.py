@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import aiofiles
 from datetime import datetime, timedelta
@@ -135,6 +136,9 @@ async def load_liveness_data(config):
             else:
                 user_liveness_data[user] = alert_config
             if "last_seen" not in user_liveness_data[user]:
+                logger.warning(
+                    f"Dead man's switch timer reset for user {user} — last_seen initialised to now()"
+                )
                 user_liveness_data[user]["last_seen"] = datetime.now()
             if "alert_sent" not in user_liveness_data[user]:
                 user_liveness_data[user]["alert_sent"] = False
@@ -296,10 +300,12 @@ async def post_message(
 
     body = await request.body()
     body = body.decode()
-    logger.info(f"received message {body}")
+    safe_body = body[:500]
+    logger.info(f"received message {safe_body}")
 
     if not chatId:
-        logger.error(f"chat group {endpoint} not found")
+        safe_endpoint = re.sub(r"[^a-zA-Z0-9_-]", "_", endpoint)
+        logger.error(f"chat group {safe_endpoint} not found")
         span.add_event("group not found")
         raise HTTPException(status_code=404)
 
