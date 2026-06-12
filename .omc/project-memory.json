@@ -66,14 +66,14 @@
   "hotPaths": [
     {
       "path": "simplex-alerter/simplex_alerter/simpx/client.py",
-      "accessCount": 5,
-      "lastAccessed": 1781261124943,
+      "accessCount": 7,
+      "lastAccessed": 1781269254599,
       "type": "file"
     },
     {
       "path": "simplex-alerter/simplex_alerter/webhook/__init__.py",
-      "accessCount": 4,
-      "lastAccessed": 1781261126941,
+      "accessCount": 5,
+      "lastAccessed": 1781269236176,
       "type": "file"
     },
     {
