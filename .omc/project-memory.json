@@ -123,6 +123,12 @@
       "accessCount": 1,
       "lastAccessed": 1781259163344,
       "type": "file"
+    },
+    {
+      "path": "config.yml",
+      "accessCount": 1,
+      "lastAccessed": 1781259206340,
+      "type": "file"
     }
   ],
   "userDirectives": []
