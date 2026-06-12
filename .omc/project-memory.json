@@ -65,6 +65,12 @@
   },
   "hotPaths": [
     {
+      "path": "simplex-alerter/simplex_alerter/simpx/client.py",
+      "accessCount": 2,
+      "lastAccessed": 1781259982173,
+      "type": "file"
+    },
+    {
       "path": "nix/packages/simplex-alerter/default.nix",
       "accessCount": 1,
       "lastAccessed": 1781258994831,
@@ -98,12 +104,6 @@
       "path": "simplex-alerter/simplex_alerter/__main__.py",
       "accessCount": 1,
       "lastAccessed": 1781259010643,
-      "type": "file"
-    },
-    {
-      "path": "simplex-alerter/simplex_alerter/simpx/client.py",
-      "accessCount": 1,
-      "lastAccessed": 1781259016406,
       "type": "file"
     },
     {
