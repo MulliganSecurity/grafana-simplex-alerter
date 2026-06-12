@@ -89,6 +89,12 @@
       "type": "file"
     },
     {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/README.md",
+      "accessCount": 3,
+      "lastAccessed": 1781265319515,
+      "type": "file"
+    },
+    {
       "path": "nix/packages/simplex-alerter/default.nix",
       "accessCount": 2,
       "lastAccessed": 1781262631583,
