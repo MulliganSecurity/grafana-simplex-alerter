@@ -1,0 +1,18 @@
+{
+  "slug": "homeserver-deploy-bugfix",
+  "epic_id": "simplex-alerter-8q8",
+  "repos": [
+    {
+      "name": "simplex-alerter",
+      "path": "/home/urist/Documents/perso/simplex-alerter",
+      "branch": "epic/homeserver-deploy-bugfix",
+      "role": "primary"
+    },
+    {
+      "name": "machines_conf",
+      "path": "/home/urist/Documents/perso/machines_conf",
+      "branch": "epic/homeserver-deploy-bugfix",
+      "role": "foreign"
+    }
+  ]
+}
