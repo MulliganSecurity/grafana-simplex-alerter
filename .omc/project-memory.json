@@ -66,8 +66,20 @@
   "hotPaths": [
     {
       "path": "simplex-alerter/simplex_alerter/simpx/client.py",
+      "accessCount": 3,
+      "lastAccessed": 1781260154557,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/__init__.py",
       "accessCount": 2,
-      "lastAccessed": 1781259982173,
+      "lastAccessed": 1781260155147,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/simpx/command.py",
+      "accessCount": 2,
+      "lastAccessed": 1781260169225,
       "type": "file"
     },
     {
@@ -92,12 +104,6 @@
       "path": "simplex-alerter/simplex_alerter/chat.py",
       "accessCount": 1,
       "lastAccessed": 1781259005223,
-      "type": "file"
-    },
-    {
-      "path": "simplex-alerter/simplex_alerter/webhook/__init__.py",
-      "accessCount": 1,
-      "lastAccessed": 1781259010095,
       "type": "file"
     },
     {
