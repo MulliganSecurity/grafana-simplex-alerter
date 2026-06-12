@@ -79,6 +79,25 @@ deadmans_switch:
     inheritance_message: "Here is the inheritance document"
 ```
 
+## Sending webhooks
+
+Routing is **URL-path only**. The `POST /{endpoint}` path segment must match an `endpoint_name` from your `alert_groups` config exactly. There is no body-based group routing — any `group_name` field in the payload body is ignored.
+
+```bash
+# Correct: path segment matches endpoint_name "BackupDr"
+curl -X POST http://localhost:3334/BackupDr \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title": "DR test passed", "description": "...", "severity": "info"}'
+
+# Wrong: /api/alert does not exist — returns 404
+curl -X POST http://localhost:3334/api/alert ...
+```
+
+If `webhook_secret` is set in config, include `Authorization: Bearer <secret>` on every request.
+
+Unknown or extra fields in the payload body are accepted and ignored. Payloads that do not match any `KnownModels` schema fall back to pretty-printed raw JSON in the SimpleX message.
+
 ## CLI flags
 
 ```
