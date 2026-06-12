@@ -89,15 +89,15 @@
       "type": "file"
     },
     {
-      "path": ".state/worktrees/homeserver-deploy-bugfix/README.md",
-      "accessCount": 3,
-      "lastAccessed": 1781265319515,
+      "path": "nix/packages/docker-image/default.nix",
+      "accessCount": 4,
+      "lastAccessed": 1781300152930,
       "type": "file"
     },
     {
-      "path": "nix/packages/docker-image/default.nix",
+      "path": ".state/worktrees/homeserver-deploy-bugfix/README.md",
       "accessCount": 3,
-      "lastAccessed": 1781300133338,
+      "lastAccessed": 1781265319515,
       "type": "file"
     },
     {
