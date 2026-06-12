@@ -141,6 +141,36 @@
       "accessCount": 1,
       "lastAccessed": 1781261125429,
       "type": "file"
+    },
+    {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/flake.nix",
+      "accessCount": 1,
+      "lastAccessed": 1781264999996,
+      "type": "file"
+    },
+    {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/simplex-alerter/simplex_alerter/chat.py",
+      "accessCount": 1,
+      "lastAccessed": 1781265019407,
+      "type": "file"
+    },
+    {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/simplex-alerter/simplex_alerter/config.py",
+      "accessCount": 1,
+      "lastAccessed": 1781265019692,
+      "type": "file"
+    },
+    {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/simplex-alerter/simplex_alerter/webhook/__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1781265019785,
+      "type": "file"
+    },
+    {
+      "path": ".state/worktrees/homeserver-deploy-bugfix/simplex-alerter/simplex_alerter/__main__.py",
+      "accessCount": 1,
+      "lastAccessed": 1781265025265,
+      "type": "file"
     }
   ],
   "userDirectives": []
