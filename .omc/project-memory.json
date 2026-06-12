@@ -101,6 +101,12 @@
       "type": "file"
     },
     {
+      "path": "simplex-alerter/simplex_alerter/simpx/transport.py",
+      "accessCount": 2,
+      "lastAccessed": 1781269418000,
+      "type": "file"
+    },
+    {
       "path": "nix/packages/docker-image/default.nix",
       "accessCount": 1,
       "lastAccessed": 1781258995457,
@@ -140,12 +146,6 @@
       "path": "config.yml",
       "accessCount": 1,
       "lastAccessed": 1781259206340,
-      "type": "file"
-    },
-    {
-      "path": "simplex-alerter/simplex_alerter/simpx/transport.py",
-      "accessCount": 1,
-      "lastAccessed": 1781261125429,
       "type": "file"
     },
     {
