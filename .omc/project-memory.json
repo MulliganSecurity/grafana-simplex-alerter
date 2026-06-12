@@ -189,6 +189,12 @@
       "accessCount": 1,
       "lastAccessed": 1781265025265,
       "type": "file"
+    },
+    {
+      "path": ".state/worktrees/fix-transport-resp-format/simplex-alerter/simplex_alerter/simpx/transport.py",
+      "accessCount": 1,
+      "lastAccessed": 1781271875729,
+      "type": "file"
     }
   ],
   "userDirectives": []
