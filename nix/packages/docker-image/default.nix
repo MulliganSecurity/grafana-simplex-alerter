@@ -20,41 +20,21 @@ let
     package_name = namespace;
   };
 
-  # Get simplex-chat from upstream flake (v6.4.10)
   simplex-chat = inputs.simplex.packages.${pkgs.system}."exe:simplex-chat";
 
-  # Python alerter virtualenv
   alerter = common.pythonSet.mkVirtualEnv common.package_name common.workspace.deps.default;
 
-  # Runtime dependencies needed by simplex-chat
-  runtimeDeps = with pkgs; [
-    zlib        # libz
-    openssl     # openssl
-    gmp         # gmp
-    glibc       # C runtime
-  ];
-
 in
-pkgs.dockerTools.buildImage {
+pkgs.dockerTools.buildLayeredImage {
   name = "simplex-alerter";
   tag = "latest";
 
-  # Building from scratch (no Ubuntu base)
-  copyToRoot = pkgs.buildEnv {
-    name = "image-root";
-    paths = [
-      alerter
-      simplex-chat
-    ] ++ runtimeDeps;
-    pathsToLink = [ "/bin" "/lib" "/lib64" ];  # Include library paths
-  };
+  # Full Nix store closure is included as layers — simplex-chat finds its
+  # exact haskell.nix bootstrap glibc/gmp at their hardcoded store paths.
+  contents = [ alerter simplex-chat pkgs.dockerTools.fakeNss ];
 
   config = {
     ExposedPorts."7898" = { };
-    Env = [
-      # Set library path for runtime linking
-      "LD_LIBRARY_PATH=/lib:/lib64"
-    ];
     EntryPoint = [
       "/bin/simplex-alerter"
       "-b"
