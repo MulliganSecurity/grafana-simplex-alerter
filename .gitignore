@@ -5,3 +5,9 @@ result
 *.db
 .direnv/*
 .omc
+.state/
+.beads
+.claude
+.agent-kb
+CLAUDE.md
+AGENTS.md
