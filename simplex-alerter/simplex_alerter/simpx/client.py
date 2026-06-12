@@ -175,8 +175,11 @@ class ChatClient:
         # Fire and forget the write operation
         asyncio.create_task(self.transport.write(t))
 
-        # Wait for the response
-        return await future
+        try:
+            return await asyncio.wait_for(future, timeout=30.0)
+        except asyncio.TimeoutError:
+            self.sent_commands.pop(corr_id, None)
+            raise TimeoutError(f"simplex-chat command timed out after 30s: {cmd!r}")
 
     async def send_chat_command(self, command: ChatCommand) -> ChatResponse:
         """Send a chat command."""
