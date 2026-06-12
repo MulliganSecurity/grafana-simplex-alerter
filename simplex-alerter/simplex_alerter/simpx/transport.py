@@ -179,14 +179,18 @@ class ChatTransport(
             try:
                 json_data = json.loads(data)
                 corr_id = json_data.get("corrId")
-                right = json_data.get("resp", {}).get("Right")
-                left = json_data.get("resp", {}).get("Left")
+                resp_data = json_data.get("resp", {})
+                right = resp_data.get("Right")
+                left = resp_data.get("Left")
                 if right and isinstance(right.get("type"), str):
+                    # Old envelope format: {"resp": {"Right": {"type": ...}}}
                     resp = ChatSrvResponse(corr_id, right)
                 elif left:
-                    # Error response from simplex-chat — preserve corrId so the
-                    # awaiting future is rejected rather than leaking forever.
+                    # Old envelope error: {"resp": {"Left": {...}}}
                     resp = ChatSrvResponse(corr_id, left)
+                elif isinstance(resp_data.get("type"), str):
+                    # Flat format (simplex-chat v6.4.11+): {"resp": {"type": ...}}
+                    resp = ChatSrvResponse(corr_id, resp_data)
                 else:
                     resp = ChatResponseError("Invalid response format", data)
 
