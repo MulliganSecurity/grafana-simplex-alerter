@@ -1,0 +1,275 @@
+{
+  "version": "1.0.0",
+  "lastScanned": 1777542329844,
+  "projectRoot": "/home/urist/simplex-alerter",
+  "techStack": {
+    "languages": [],
+    "frameworks": [],
+    "packageManager": null,
+    "runtime": null
+  },
+  "build": {
+    "buildCommand": null,
+    "testCommand": null,
+    "lintCommand": null,
+    "devCommand": null,
+    "scripts": {}
+  },
+  "conventions": {
+    "namingStyle": null,
+    "importStyle": null,
+    "testPattern": null,
+    "fileOrganization": null
+  },
+  "structure": {
+    "isMonorepo": false,
+    "workspaces": [],
+    "mainDirectories": [],
+    "gitBranches": {
+      "defaultBranch": "master",
+      "branchingStrategy": null
+    }
+  },
+  "customNotes": [],
+  "directoryMap": {
+    "nix": {
+      "path": "nix",
+      "purpose": null,
+      "fileCount": 1,
+      "lastAccessed": 1777542329753,
+      "keyFiles": [
+        "uv_setup.nix"
+      ]
+    },
+    "simplex-alerter": {
+      "path": "simplex-alerter",
+      "purpose": null,
+      "fileCount": 4,
+      "lastAccessed": 1777542329767,
+      "keyFiles": [
+        "README.md",
+        "pyproject.toml",
+        "uv.lock"
+      ]
+    }
+  },
+  "hotPaths": [
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/__init__.py",
+      "accessCount": 44,
+      "lastAccessed": 1777550251167,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/chat.py",
+      "accessCount": 14,
+      "lastAccessed": 1777550295144,
+      "type": "file"
+    },
+    {
+      "path": "nix/packages/docker-image/default.nix",
+      "accessCount": 6,
+      "lastAccessed": 1777545934147,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/pyproject.toml",
+      "accessCount": 5,
+      "lastAccessed": 1777549634117,
+      "type": "file"
+    },
+    {
+      "path": "nix/packages/simplex-alerter/default.nix",
+      "accessCount": 4,
+      "lastAccessed": 1777545909205,
+      "type": "file"
+    },
+    {
+      "path": "flake.nix",
+      "accessCount": 4,
+      "lastAccessed": 1777545985672,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/__main__.py",
+      "accessCount": 4,
+      "lastAccessed": 1777549625918,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/request_models/servarr.py",
+      "accessCount": 4,
+      "lastAccessed": 1777549660843,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/config.py",
+      "accessCount": 4,
+      "lastAccessed": 1777549763143,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/request_models/grafana.py",
+      "accessCount": 3,
+      "lastAccessed": 1777549762406,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/simpx/client.py",
+      "accessCount": 3,
+      "lastAccessed": 1777549779281,
+      "type": "file"
+    },
+    {
+      "path": "nix/packages/simplex-chat/default.nix",
+      "accessCount": 2,
+      "lastAccessed": 1777546003178,
+      "type": "file"
+    },
+    {
+      "path": "nix/packages/simplexmq/default.nix",
+      "accessCount": 2,
+      "lastAccessed": 1777546029403,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/request_models/__init__.py",
+      "accessCount": 2,
+      "lastAccessed": 1777549627554,
+      "type": "file"
+    },
+    {
+      "path": "",
+      "accessCount": 2,
+      "lastAccessed": 1777549634239,
+      "type": "directory"
+    },
+    {
+      "path": "simplex-alerter/simplex_alerter/webhook/request_models/forgejo.py",
+      "accessCount": 2,
+      "lastAccessed": 1777549663721,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/test_request_models_grafana.py",
+      "accessCount": 2,
+      "lastAccessed": 1777549752993,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/conftest.py",
+      "accessCount": 2,
+      "lastAccessed": 1777549760960,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/integration/test_webhook_routing.py",
+      "accessCount": 2,
+      "lastAccessed": 1777550275722,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/integration/test_deadmans_switch.py",
+      "accessCount": 2,
+      "lastAccessed": 1777550326885,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/README.md",
+      "accessCount": 1,
+      "lastAccessed": 1777542346734,
+      "type": "file"
+    },
+    {
+      "path": "Dockerfile",
+      "accessCount": 1,
+      "lastAccessed": 1777542348140,
+      "type": "file"
+    },
+    {
+      "path": "nix/shells/dev/default.nix",
+      "accessCount": 1,
+      "lastAccessed": 1777542367109,
+      "type": "file"
+    },
+    {
+      "path": "CLAUDE.md",
+      "accessCount": 1,
+      "lastAccessed": 1777542415357,
+      "type": "file"
+    },
+    {
+      "path": "nix/uv_setup.nix",
+      "accessCount": 1,
+      "lastAccessed": 1777543257391,
+      "type": "file"
+    },
+    {
+      "path": "nix/overlays/github/default.nix",
+      "accessCount": 1,
+      "lastAccessed": 1777543257557,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549668555,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/e2e/__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549669632,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/e2e/conftest.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549677215,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549677349,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/e2e/test_full_alert_flow.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549681090,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/test_request_models_servarr.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549698302,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/test_request_models_forgejo.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549713272,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/test_config.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549718280,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/unit/test_chat_utils.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549722126,
+      "type": "file"
+    },
+    {
+      "path": "simplex-alerter/tests/integration/__init__.py",
+      "accessCount": 1,
+      "lastAccessed": 1777549780159,
+      "type": "file"
+    }
+  ],
+  "userDirectives": []
+}
